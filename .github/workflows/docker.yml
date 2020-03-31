@@ -1,14 +1,30 @@
-name: Build and push Docker images
+name: build
 
 on:
   push:
-    branches: [ master ]
+    branches:
+      - 'master'
+    paths:
+      - '.dockerignore'
+      - 'Dockerfile'
   pull_request:
-    branches: [ master ]
+    branches:
+      - 'master'
+    paths:
+      - '.dockerignore'
+      - 'Dockerfile'
 
 jobs:
-  distcc-tcp:
-    name: Build and push distcc-tcp target
+  build:
+    strategy:
+      matrix:
+        target: [distcc-tcp, distcc-ssh]
+        include:
+          - target: distcc-tcp
+            tags: latest,latest-tcp,tcp
+          - target: distcc-ssh
+            tags: latest-ssh,ssh
+    name: ${{ matrix.target }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -17,20 +33,6 @@ jobs:
           repository: ksmanis/gentoo-distcc
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-          tags: latest,latest-tcp,tcp
-          target: distcc-tcp
-          add_git_labels: true
-
-  distcc-ssh:
-    name: Build and push distcc-ssh target
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: docker/build-push-action@v1.0.1
-        with:
-          repository: ksmanis/gentoo-distcc
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-          tags: latest-ssh,ssh
-          target: distcc-ssh
+          tags: ${{ matrix.tags }}
+          target: ${{ matrix.target }}
           add_git_labels: true
