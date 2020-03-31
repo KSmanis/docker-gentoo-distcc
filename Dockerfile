@@ -10,11 +10,7 @@ EXPOSE 3632
 
 FROM scratch AS distcc-ssh
 COPY --from=distcc-builder / /
-ARG user=distcc-ssh
-RUN useradd ${user} && \
-    touch /home/${user}/.ssh/authorized_keys && \
-    chown ${user}:${user} /home/${user}/.ssh/authorized_keys && \
-    chmod 600 /home/${user}/.ssh/authorized_keys && \
-    ssh-keygen -A
-ENTRYPOINT ["/usr/sbin/sshd", "-D", "-e"]
+ENV USER=distcc-ssh
+COPY entrypoint-distcc-ssh.sh /
+ENTRYPOINT ["/entrypoint-distcc-ssh.sh"]
 EXPOSE 22

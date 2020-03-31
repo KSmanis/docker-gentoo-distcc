@@ -7,12 +7,14 @@ on:
     paths:
       - '.dockerignore'
       - 'Dockerfile'
+      - 'entrypoint-distcc-ssh.sh'
   pull_request:
     branches:
       - 'master'
     paths:
       - '.dockerignore'
       - 'Dockerfile'
+      - 'entrypoint-distcc-ssh.sh'
 
 jobs:
   build:
