@@ -1,0 +1,7 @@
+#!/bin/bash
+
+docker push ${DOCKER_REPO}:latest
+docker push ${DOCKER_REPO}:latest-tcp
+docker push ${DOCKER_REPO}:tcp
+docker push ${DOCKER_REPO}:latest-ssh
+docker push ${DOCKER_REPO}:ssh
