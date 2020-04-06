@@ -54,14 +54,15 @@ CONTAINER ID        IMAGE                       COMMAND                  CREATED
 30cecb2ddae4        ksmanis/gentoo-distcc:ssh   "/entrypoint-distcc-…"   3 seconds ago       Up 1 second         0.0.0.0:30022->22/tcp   gentoo-distcc-ssh
 ```
 
-Only the `distcc-ssh` user is accessible with the public key provided with the required `AUTHORIZED_KEYS` environment variable. The username is configurable through the optional `USER` environment variable:
-```shell
-docker run -d -p 30022:22 -e USER=bob -e AUTHORIZED_KEYS="..." --name gentoo-distcc-ssh --rm ksmanis/gentoo-distcc:ssh
-```
-
-*Tip*: Instead of including the public key verbatim in the above command, you may prefer to read it from a file on the Docker host:
+Instead of including the public key verbatim in the above command, you may prefer to read it from a file on the Docker host:
 ```shell
 docker run -d -p 30022:22 -e AUTHORIZED_KEYS="$(cat /path/to/key.pub)" --name gentoo-distcc-ssh --rm ksmanis/gentoo-distcc:ssh
+```
+
+#### Security
+The SSH server allows only public key authentication. More specifically, only the `distcc-ssh` user is accessible with the public key provided with the required `AUTHORIZED_KEYS` environment variable. The username is configurable through the optional `USER` environment variable:
+```shell
+docker run -d -p 30022:22 -e USER=bob -e AUTHORIZED_KEYS="..." --name gentoo-distcc-ssh --rm ksmanis/gentoo-distcc:ssh
 ```
 
 ## Testing
@@ -95,7 +96,7 @@ Host localhost-distcc
     StrictHostKeyChecking no
 ```
 
-*Note*: `StrictHostKeyChecking no` is required in the above configuration because the host keys of the container are automatically regenerated upon execution, if missing. If you wish to remove this potential security issue, you should store the host keys in a volume and mount them upon execution so that they are not regenerated.
+*Note*: `StrictHostKeyChecking no` is required in the above configuration because the host keys of the container are automatically regenerated upon execution, if missing. If you wish to eliminate this potential security issue, you should store the host keys in a volume and mount them upon execution so that they are not regenerated.
 
 ## Build
-Should you wish to roll your own version, e.g., with an unstable toolchain, the [build](hooks/build) script can be a good starting point.
+Should you wish to roll your own version, e.g., with an unstable toolchain, the [build](hooks/build) script would be a good starting point.
