@@ -1,7 +1,7 @@
-# Gentoo Docker container with distcc
+# Gentoo Docker image with distcc
 [![Docker Build Status](https://img.shields.io/docker/cloud/build/ksmanis/gentoo-distcc)](https://hub.docker.com/r/ksmanis/gentoo-distcc)
 
-Minimal Gentoo Docker container with distcc that can be used to speed up compilation jobs.
+Gentoo Docker image with distcc that can be used to speed up compilation jobs
 
 ## Features
  * Flexible deployment
