@@ -1,4 +1,4 @@
 #!/bin/bash
 
-docker build -t ${DOCKER_REPO}:latest -t ${DOCKER_REPO}:latest-tcp -t ${DOCKER_REPO}:tcp --target distcc-tcp .
-docker build -t ${DOCKER_REPO}:latest-ssh -t ${DOCKER_REPO}:ssh --target distcc-ssh .
+docker build -t "${DOCKER_REPO}:latest" -t "${DOCKER_REPO}:latest-tcp" -t "${DOCKER_REPO}:tcp" --target distcc-tcp .
+docker build -t "${DOCKER_REPO}:latest-ssh" -t "${DOCKER_REPO}:ssh" --target distcc-ssh .
