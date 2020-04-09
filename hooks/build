@@ -1,17 +1,12 @@
 #!/bin/bash
 
 BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-VCS_REF=${SOURCE_COMMIT}
-docker build -t "${DOCKER_REPO}:latest" \
-             -t "${DOCKER_REPO}:latest-tcp" \
-             -t "${DOCKER_REPO}:tcp" \
-             --build-arg BUILD_DATE="${BUILD_DATE}" \
-             --build-arg VCS_REF="${VCS_REF}" \
-             --target distcc-tcp \
-             .
-docker build -t "${DOCKER_REPO}:latest-ssh" \
-             -t "${DOCKER_REPO}:ssh" \
-             --build-arg BUILD_DATE="${BUILD_DATE}" \
-             --build-arg VCS_REF="${VCS_REF}" \
-             --target distcc-ssh \
-             .
+declare -A TARGET_TAGS=([distcc-tcp]="latest,latest-tcp,tcp" [distcc-ssh]="latest-ssh,ssh")
+for target in "${!TARGET_TAGS[@]}"; do
+    IFS=',' read -ra tags <<< "${TARGET_TAGS[${target}]}"
+    docker build "--build-arg=BUILD_DATE=${BUILD_DATE}" \
+                 "--build-arg=VCS_REF=${SOURCE_COMMIT}" \
+                 "${tags[@]/#/--tag=${DOCKER_REPO}:}" \
+                 "--target=${target}" \
+                 .
+done
