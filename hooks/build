@@ -1,10 +1,14 @@
 #!/bin/bash
 
-BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-declare -A TARGET_TAGS=([distcc-tcp]="latest,latest-tcp,tcp" [distcc-ssh]="latest-ssh,ssh")
+BUILD_DATE=$(date -u +"%Y%m%d")
+BUILD_DATETIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+declare -A TARGET_TAGS=(
+    [distcc-tcp]="latest,latest-tcp,tcp,${BUILD_DATE}-tcp"
+    [distcc-ssh]="latest-ssh,ssh,${BUILD_DATE}-ssh"
+)
 for target in "${!TARGET_TAGS[@]}"; do
     IFS=',' read -ra tags <<< "${TARGET_TAGS[${target}]}"
-    docker build "--build-arg=BUILD_DATE=${BUILD_DATE}" \
+    docker build "--build-arg=BUILD_DATETIME=${BUILD_DATETIME}" \
                  "--build-arg=VCS_REF=${SOURCE_COMMIT}" \
                  "${tags[@]/#/--tag=${DOCKER_REPO}:}" \
                  "--target=${target}" \
