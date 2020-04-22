@@ -1,6 +1,3 @@
 #!/bin/bash
 
-TAGS=(latest latest-tcp tcp latest-ssh ssh)
-for tag in "${TAGS[@]}"; do
-    docker push "${DOCKER_REPO}:${tag}"
-done
+docker push "${DOCKER_REPO}"
