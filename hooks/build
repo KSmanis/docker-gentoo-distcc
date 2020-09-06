@@ -3,8 +3,8 @@
 BUILD_DATE=$(date -u +"%Y%m%d")
 BUILD_DATETIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 declare -A TARGET_TAGS=(
-    [distcc-tcp]="tcp,${BUILD_DATE}-tcp,latest"
-    [distcc-ssh]="ssh,${BUILD_DATE}-ssh"
+    [distcc-tcp]="tcp,tcp-${BUILD_DATE},latest"
+    [distcc-ssh]="ssh,ssh-${BUILD_DATE}"
 )
 for target in "${!TARGET_TAGS[@]}"; do
     IFS=',' read -ra tags <<< "${TARGET_TAGS[${target}]}"
