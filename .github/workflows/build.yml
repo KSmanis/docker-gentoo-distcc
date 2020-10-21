@@ -1,0 +1,109 @@
+name: build
+
+on:
+  schedule:
+    - cron: '0 6 * * *'
+  push:
+  pull_request:
+
+env:
+  DOCKERHUB_REPOSITORY: ksmanis/gentoo-distcc
+
+jobs:
+  build_images:
+    strategy:
+      matrix:
+        arch: [amd64, arm/v5, arm/v6, arm/v7, arm64, ppc64le]
+        target: [tcp, ssh]
+    name: ${{ matrix.arch }}:${{ matrix.target }} image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      - name: Set up buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Prepare build variables
+        id: prep
+        run: |
+          BUILD_DATE=$(date -u +'%Y%m%d')
+          BUILD_DATETIME=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+          ARCH=$(echo "${{ matrix.arch }}" | tr -d '/')
+          TAG="${ARCH}-${{ matrix.target }}"
+          IMAGE="${DOCKERHUB_REPOSITORY}:${TAG}"
+          echo ::set-output name=BUILD_DATE::${BUILD_DATE}
+          echo ::set-output name=BUILD_DATETIME::${BUILD_DATETIME}
+          echo ::set-output name=IMAGE::${IMAGE}
+      - name: Build image
+        uses: docker/build-push-action@v2
+        with:
+          build-args: |
+            BUILD_DATETIME=${{ steps.prep.outputs.BUILD_DATETIME }}
+            VCS_REF=${{ github.sha }}
+          tags: |
+            ${{ steps.prep.outputs.IMAGE }}
+            ${{ steps.prep.outputs.IMAGE }}-${{ steps.prep.outputs.BUILD_DATE }}
+          platforms: linux/${{ matrix.arch }}
+          target: distcc-${{ matrix.target }}
+          load: true
+      - name: Inspect image
+        run: |
+          docker image inspect ${{ steps.prep.outputs.IMAGE }}
+      - name: Inspect distcc
+        run: |
+          docker run --entrypoint /usr/bin/env --rm ${{ steps.prep.outputs.IMAGE }} distcc --version
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        if: github.event_name == 'schedule'
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+      - name: Push image
+        if: github.event_name == 'schedule'
+        run: |
+          docker push "${DOCKERHUB_REPOSITORY}"
+  build_manifests:
+    strategy:
+      matrix:
+        target: [tcp, ssh]
+    name: ${{ matrix.target }} manifest
+    runs-on: ubuntu-latest
+    needs: build_images
+    if: github.event_name == 'schedule'
+    steps:
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+      - name: Build and push manifest list
+        env:
+          DOCKER_CLI_EXPERIMENTAL: enabled
+        run: |
+          ARCHES=("amd64" "armv5" "armv6" "armv7" "arm64" "ppc64le")
+          BUILD_DATE=$(date -u +'%Y%m%d')
+          MANIFEST_TAGS=("${{ matrix.target }}-${BUILD_DATE}" "${{ matrix.target }}")
+
+          for MANIFEST_TAG in "${MANIFEST_TAGS[@]}"; do
+            MANIFEST="${DOCKERHUB_REPOSITORY}:${MANIFEST_TAG}"
+            IMAGES=()
+            for ARCH in "${ARCHES[@]}"; do
+              IMAGES+=("${DOCKERHUB_REPOSITORY}:${ARCH}-${MANIFEST_TAG}")
+            done
+            docker manifest create "${MANIFEST}" "${IMAGES[@]}"
+            docker manifest push "${MANIFEST}"
+          done
+  update_readme:
+    name: README
+    runs-on: ubuntu-latest
+    needs: build_manifests
+    if: github.event_name == 'schedule'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Update repo description
+        uses: peter-evans/dockerhub-description@v2
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}

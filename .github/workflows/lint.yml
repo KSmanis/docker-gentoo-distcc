@@ -10,4 +10,4 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Run shellcheck
-        run: bash -c 'shopt -s globstar nullglob; shellcheck **/*.sh hooks/*'
+        run: bash -c 'shopt -s globstar nullglob; shellcheck **/*.sh'

@@ -1,5 +1,5 @@
 # Gentoo Docker image with distcc
-[![Docker Build Status](https://img.shields.io/docker/cloud/build/ksmanis/gentoo-distcc)](https://hub.docker.com/r/ksmanis/gentoo-distcc)
+[![build](https://github.com/KSmanis/docker-gentoo-distcc/workflows/build/badge.svg)](https://github.com/KSmanis/docker-gentoo-distcc/actions?workflow=build)
 
 Gentoo Docker image with distcc that can be used to speed up compilation jobs
 
@@ -7,7 +7,11 @@ Gentoo Docker image with distcc that can be used to speed up compilation jobs
  * Flexible deployment
    * Locally (in a private network)
    * Remotely (over the Internet)
- * Out-of-the-box support for the `amd64` Gentoo architecture
+ * Out-of-the-box support for the following Gentoo architectures:
+   * `amd64`
+   * `arm`
+   * `arm64`
+   * `ppc64`
 
 ## Usage
 distcc can run over TCP or SSH connections. TCP connections are fast but relatively insecure, whereas SSH connections are secure but slower. In a trusted environment, such as a LAN, you should use TCP connections for efficiency; otherwise use SSH connections.
@@ -97,6 +101,3 @@ Host localhost-distcc
 ```
 
 *Note*: `StrictHostKeyChecking no` is required in the above configuration because the host keys of the container are automatically regenerated upon execution, if missing. If you wish to eliminate this potential security issue, you should store the host keys in a volume and mount them upon execution so that they are not regenerated.
-
-## Build
-Should you wish to roll your own version, e.g., with an unstable toolchain, the [build](hooks/build) script would be a good starting point.
