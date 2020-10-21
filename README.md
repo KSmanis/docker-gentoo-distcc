@@ -1,5 +1,6 @@
 # Gentoo Docker image with distcc
 [![build](https://github.com/KSmanis/docker-gentoo-distcc/workflows/build/badge.svg)](https://github.com/KSmanis/docker-gentoo-distcc/actions?workflow=build)
+[![lint](https://github.com/KSmanis/docker-gentoo-distcc/workflows/lint/badge.svg)](https://github.com/KSmanis/docker-gentoo-distcc/actions?workflow=lint)
 
 Gentoo Docker image with distcc that can be used to speed up compilation jobs
 
