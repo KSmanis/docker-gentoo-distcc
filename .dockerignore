@@ -1,2 +1,4 @@
-# Ignore all hidden files and directories
-**/.*
+# Ignore everything...
+*
+# ...except the following
+!entrypoint-distcc-ssh.sh
