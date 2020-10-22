@@ -3,11 +3,15 @@ name: lint
 on: [push, pull_request]
 
 jobs:
-  shellcheck:
-    name: Lint with shellcheck
+  super_linter:
+    name: super-linter
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Run shellcheck
-        run: bash -c 'shopt -s globstar nullglob; shellcheck **/*.sh'
+        with:
+          fetch-depth: 0
+      - name: Run super-linter
+        uses: github/super-linter@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

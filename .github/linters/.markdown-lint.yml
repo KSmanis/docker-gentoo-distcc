@@ -1,0 +1,5 @@
+---
+blank_lines: false
+line_length: false
+no-duplicate-header:
+  allow_different_nesting: true

@@ -1,0 +1,4 @@
+---
+rules:
+  # Base images should specify a tag to use
+  missing_tag: off

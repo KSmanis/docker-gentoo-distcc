@@ -5,14 +5,14 @@
 Gentoo Docker image with distcc that can be used to speed up compilation jobs
 
 ## Features
- * Flexible deployment
-   * Locally (in a private network)
-   * Remotely (over the Internet)
- * Out-of-the-box support for the following Gentoo architectures:
-   * `amd64`
-   * `arm`
-   * `arm64`
-   * `ppc64`
+* Flexible deployment
+  * Locally (in a private network)
+  * Remotely (over the Internet)
+* Out-of-the-box support for the following Gentoo architectures:
+  * `amd64`
+  * `arm`
+  * `arm64`
+  * `ppc64`
 
 ## Usage
 distcc can run over TCP or SSH connections. TCP connections are fast but relatively insecure, whereas SSH connections are secure but slower. In a trusted environment, such as a LAN, you should use TCP connections for efficiency; otherwise use SSH connections.
@@ -92,7 +92,7 @@ DISTCC_HOSTS="@localhost-distcc" DISTCC_VERBOSE=1 distcc gcc -c main.c -o /dev/n
 ```
 
 The `localhost-distcc` host should be properly set up in your `~/.ssh/config`:
-```
+```ssh-config
 Host localhost-distcc
     HostName 127.0.0.1
     Port 30022
