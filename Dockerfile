@@ -1,5 +1,7 @@
-FROM gentoo/stage3 AS distcc-builder
-COPY --from=gentoo/portage /var/db/repos/gentoo /var/db/repos/gentoo
+ARG BASE_TAG=latest
+FROM gentoo/portage:$BASE_TAG AS portage
+FROM gentoo/stage3:$BASE_TAG AS distcc-builder
+COPY --from=portage /var/db/repos/gentoo /var/db/repos/gentoo
 RUN emerge -1q distcc
 RUN rm -rf /var/cache/distfiles/* /var/db/repos/gentoo/
 

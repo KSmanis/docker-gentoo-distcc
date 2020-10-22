@@ -39,6 +39,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           build-args: |
+            BASE_TAG=${{ steps.prep.outputs.BUILD_DATE }}
             BUILD_DATETIME=${{ steps.prep.outputs.BUILD_DATETIME }}
             VCS_REF=${{ github.sha }}
           tags: |
