@@ -43,8 +43,8 @@ jobs:
             BUILD_DATETIME=${{ steps.prep.outputs.BUILD_DATETIME }}
             VCS_REF=${{ github.sha }}
           tags: |
-            ${{ steps.prep.outputs.IMAGE }}
             ${{ steps.prep.outputs.IMAGE }}-${{ steps.prep.outputs.BUILD_DATE }}
+            ${{ steps.prep.outputs.IMAGE }}
           platforms: linux/${{ matrix.arch }}
           target: distcc-${{ matrix.target }}
           load: true
