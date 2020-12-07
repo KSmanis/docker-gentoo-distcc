@@ -1,6 +1,6 @@
 ARG BASE_TAG=latest
-FROM gentoo/portage:$BASE_TAG AS portage
-FROM gentoo/stage3:$BASE_TAG AS distcc-builder
+FROM ksmanis/portage:$BASE_TAG AS portage
+FROM ksmanis/stage3:$BASE_TAG AS distcc-builder
 COPY --from=portage /var/db/repos/gentoo /var/db/repos/gentoo
 RUN emerge -1q distcc
 RUN rm -rf /var/cache/distfiles/* /var/db/repos/gentoo/
