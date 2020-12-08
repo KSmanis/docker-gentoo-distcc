@@ -18,7 +18,7 @@ jobs:
         target: [tcp, ssh]
     name: ${{ matrix.arch }}:${{ matrix.target }} image
     runs-on: ubuntu-latest
-    continue-on-error: true
+    continue-on-error: ${{ github.event_name == 'schedule' }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
