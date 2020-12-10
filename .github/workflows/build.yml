@@ -92,7 +92,10 @@ jobs:
             MANIFEST="${DOCKERHUB_REPOSITORY}:${MANIFEST_TAG}"
             IMAGES=()
             for ARCH in "${ARCHES[@]}"; do
-              IMAGES+=("${DOCKERHUB_REPOSITORY}:${ARCH}-${MANIFEST_TAG}")
+              IMAGE="${DOCKERHUB_REPOSITORY}:${ARCH}-${MANIFEST_TAG}"
+              if docker manifest inspect "${IMAGE}" 1>/dev/null 2>&1; then
+                IMAGES+=("${IMAGE}")
+              fi
             done
             docker manifest create "${MANIFEST}" "${IMAGES[@]}"
             docker manifest push "${MANIFEST}"
