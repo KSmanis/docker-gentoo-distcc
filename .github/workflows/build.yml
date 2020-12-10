@@ -45,8 +45,8 @@ jobs:
             BUILD_DATETIME=${{ steps.prep.outputs.BUILD_DATETIME }}
             VCS_REF=${{ github.sha }}
           tags: |
-            ${{ steps.prep.outputs.IMAGE }}-${{ steps.prep.outputs.BUILD_DATE }}
             ${{ steps.prep.outputs.IMAGE }}
+            ${{ steps.prep.outputs.IMAGE }}-${{ steps.prep.outputs.BUILD_DATE }}
           platforms: linux/${{ matrix.arch }}
           target: distcc-${{ matrix.target }}
           load: true
@@ -86,7 +86,7 @@ jobs:
         run: |
           ARCHES=("amd64" "armv5" "armv6" "armv7" "arm64" "ppc64le")
           BUILD_DATE=$(date -u +'%Y%m%d')
-          MANIFEST_TAGS=("${{ matrix.target }}-${BUILD_DATE}" "${{ matrix.target }}")
+          MANIFEST_TAGS=("${{ matrix.target }}" "${{ matrix.target }}-${BUILD_DATE}")
 
           for MANIFEST_TAG in "${MANIFEST_TAGS[@]}"; do
             MANIFEST="${DOCKERHUB_REPOSITORY}:${MANIFEST_TAG}"
