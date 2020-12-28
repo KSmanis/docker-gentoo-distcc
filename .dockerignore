@@ -1,4 +1,4 @@
 # Ignore everything...
 *
 # ...except the following
-!entrypoint-distcc-ssh.sh
+!docker-entrypoint-ssh.sh

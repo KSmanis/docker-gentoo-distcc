@@ -42,7 +42,7 @@ CONTAINER ID        IMAGE                       COMMAND                  CREATED
 04f5cf5eaa4a        ksmanis/gentoo-distcc:tcp   "distccd --daemon --…"   2 seconds ago       Up 1 second         0.0.0.0:3632-3633->3632-3633/tcp   gentoo-distcc-tcp
 ```
 
-For a full list of options, refer to [distccd(1)](https://linux.die.net/man/1/distccd).
+For a full list of options refer to [distccd(1)](https://linux.die.net/man/1/distccd).
 
 *Note*: distccd is not designed to run as PID 1. As a result, it is highly recommended to use the [`--init`](https://docs.docker.com/engine/reference/run/#specify-an-init-process) docker run flag, as shown above, for distccd to behave correctly.
 
@@ -56,7 +56,7 @@ sshd should now be accessible from all interfaces at port 30022 (`0.0.0.0:30022`
 ```shell
 $ docker ps
 CONTAINER ID        IMAGE                       COMMAND                  CREATED             STATUS              PORTS                   NAMES
-30cecb2ddae4        ksmanis/gentoo-distcc:ssh   "/entrypoint-distcc-…"   3 seconds ago       Up 1 second         0.0.0.0:30022->22/tcp   gentoo-distcc-ssh
+5aa87c1eaf59        ksmanis/gentoo-distcc:ssh   "docker-entrypoint.sh"   3 seconds ago       Up 2 seconds        0.0.0.0:30022->22/tcp   gentoo-distcc-ssh
 ```
 
 Instead of including the public key verbatim in the above command, you may prefer to read it from a file on the Docker host:

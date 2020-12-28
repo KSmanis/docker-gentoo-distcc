@@ -1,7 +1,7 @@
 ARG BASE_TAG=latest
 FROM ksmanis/portage:$BASE_TAG AS portage
 FROM ksmanis/stage3:$BASE_TAG AS distcc-builder
-COPY --from=portage /var/db/repos/gentoo /var/db/repos/gentoo
+COPY --from=portage /var/db/repos/gentoo/ /var/db/repos/gentoo/
 RUN emerge -1q distcc
 RUN rm -rf /var/cache/distfiles/* /var/db/repos/gentoo/
 
@@ -22,6 +22,6 @@ EXPOSE 3632
 
 FROM distcc-builder-squashed AS distcc-ssh
 ENV SSH_USERNAME=distcc-ssh
-COPY entrypoint-distcc-ssh.sh /
-ENTRYPOINT ["/entrypoint-distcc-ssh.sh"]
+COPY docker-entrypoint-ssh.sh /usr/local/bin/docker-entrypoint.sh
+ENTRYPOINT ["docker-entrypoint.sh"]
 EXPOSE 22
