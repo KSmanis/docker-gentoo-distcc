@@ -21,7 +21,7 @@ ENTRYPOINT ["distccd", "--daemon", "--no-detach", "--log-level", "notice", "--lo
 EXPOSE 3632
 
 FROM distcc-builder-squashed AS distcc-ssh
-ENV USER=distcc-ssh
+ENV SSH_USERNAME=distcc-ssh
 COPY entrypoint-distcc-ssh.sh /
 ENTRYPOINT ["/entrypoint-distcc-ssh.sh"]
 EXPOSE 22

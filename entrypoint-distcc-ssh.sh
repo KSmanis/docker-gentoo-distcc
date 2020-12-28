@@ -1,10 +1,10 @@
 #!/bin/sh
 
 # Create user and set up SSH access
-useradd "${USER}"
-echo "${AUTHORIZED_KEYS}" > "/home/${USER}/.ssh/authorized_keys"
-chown "${USER}:${USER}" "/home/${USER}/.ssh/authorized_keys"
-chmod 600 "/home/${USER}/.ssh/authorized_keys"
+useradd "${SSH_USERNAME}"
+echo "${AUTHORIZED_KEYS}" > "/home/${SSH_USERNAME}/.ssh/authorized_keys"
+chown "${SSH_USERNAME}:${SSH_USERNAME}" "/home/${SSH_USERNAME}/.ssh/authorized_keys"
+chmod 600 "/home/${SSH_USERNAME}/.ssh/authorized_keys"
 
 # Create missing SSH host keys and execute sshd
 ssh-keygen -A

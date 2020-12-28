@@ -65,9 +65,9 @@ docker run -d -p 30022:22 -e AUTHORIZED_KEYS="$(cat /path/to/key.pub)" --name ge
 ```
 
 #### Security
-The SSH server allows only public key authentication. More specifically, only the `distcc-ssh` user is accessible with the public key provided with the required `AUTHORIZED_KEYS` environment variable. The username is configurable through the optional `USER` environment variable:
+The SSH server allows only public key authentication. More specifically, only the `distcc-ssh` user is accessible with the public key provided with the required `AUTHORIZED_KEYS` environment variable. The username is configurable through the optional `SSH_USERNAME` environment variable:
 ```shell
-docker run -d -p 30022:22 -e USER=bob -e AUTHORIZED_KEYS="..." --name gentoo-distcc-ssh --rm ksmanis/gentoo-distcc:ssh
+docker run -d -p 30022:22 -e SSH_USERNAME=bob -e AUTHORIZED_KEYS="..." --name gentoo-distcc-ssh --rm ksmanis/gentoo-distcc:ssh
 ```
 
 ## Testing
