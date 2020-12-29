@@ -17,18 +17,28 @@ LABEL org.opencontainers.image.title="gentoo-distcc" \
       org.opencontainers.image.created="$BUILD_DATETIME"
 
 FROM distcc-builder-squashed AS distcc-tcp
+ARG TARGETPLATFORM
 ARG TINI_VERSION=0.19.0
 ARG TINI_GPGKEY=595E85A6B1B4779EA4DAAEC70B588DFF0527A9B7
-ARG TINI_SHA256=93dcc18adc78c65a028a84799ecf8ad40c936fdfc5f2a57b1acda5a8117fa82c
 RUN set -eux; \
-    curl -fL "https://github.com/krallin/tini/releases/download/v${TINI_VERSION}/tini" -o /usr/local/bin/tini; \
-    curl -fL "https://github.com/krallin/tini/releases/download/v${TINI_VERSION}/tini.asc" -o /usr/local/bin/tini.asc; \
-    export GNUPGHOME="$(mktemp -d)"; \
+    case "$TARGETPLATFORM" in \
+        "linux/amd64") TINI_ARCH="amd64" ;; \
+        "linux/arm/v5") TINI_ARCH="armel" ;; \
+        "linux/arm/v6" | "linux/arm/v7") TINI_ARCH="armhf" ;; \
+        "linux/arm64") TINI_ARCH="arm64" ;; \
+        "linux/ppc64le") TINI_ARCH="ppc64le" ;; \
+    esac; \
+    curl -fL "https://github.com/krallin/tini/releases/download/v${TINI_VERSION}/tini-${TINI_ARCH}" -o /usr/local/bin/tini; \
+    curl -fL "https://github.com/krallin/tini/releases/download/v${TINI_VERSION}/tini-${TINI_ARCH}.asc" -o /usr/local/bin/tini.asc; \
+    curl -fL "https://github.com/krallin/tini/releases/download/v${TINI_VERSION}/tini-${TINI_ARCH}.sha256sum" -o /usr/local/bin/tini.sha256sum; \
+    GNUPGHOME="$(mktemp -d)"; \
+    export GNUPGHOME; \
     gpg --batch --keyserver ha.pool.sks-keyservers.net --recv-keys "${TINI_GPGKEY}"; \
     gpg --batch --verify /usr/local/bin/tini.asc /usr/local/bin/tini; \
     gpgconf --kill all; \
-    rm -rf "${GNUPGHOME}" /usr/local/bin/tini.asc; \
-    echo "${TINI_SHA256}  /usr/local/bin/tini" | sha256sum --check --strict; \
+    sed -i "s#tini-${TINI_ARCH}#/usr/local/bin/tini#" /usr/local/bin/tini.sha256sum; \
+    sha256sum --check --strict /usr/local/bin/tini.sha256sum; \
+    rm -rf "${GNUPGHOME}" /usr/local/bin/tini.asc /usr/local/bin/tini.sha256sum; \
     chmod +x /usr/local/bin/tini; \
     tini --version
 COPY docker-entrypoint-tcp.sh /usr/local/bin/docker-entrypoint.sh
