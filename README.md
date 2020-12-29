@@ -20,31 +20,29 @@ distcc can run over TCP or SSH connections. TCP connections are fast but relativ
 ### TCP
 On the worker node(s), run the containerized distcc server (distccd):
 ```shell
-docker run -d -p 3632:3632 --init --name gentoo-distcc-tcp --rm ksmanis/gentoo-distcc:tcp
+docker run -d -p 3632:3632 --name gentoo-distcc-tcp --rm ksmanis/gentoo-distcc:tcp
 ```
 
 distccd should now be accessible from all interfaces at port 3632 (`0.0.0.0:3632`):
 ```shell
 $ docker ps
 CONTAINER ID        IMAGE                       COMMAND                  CREATED             STATUS              PORTS                    NAMES
-fd2207fca306        ksmanis/gentoo-distcc:tcp   "distccd --daemon --…"   4 seconds ago       Up 3 seconds        0.0.0.0:3632->3632/tcp   gentoo-distcc-tcp
+405bb6e87ce8        ksmanis/gentoo-distcc:tcp   "tini -e 143 -- dock…"   2 seconds ago       Up 2 seconds        0.0.0.0:3632->3632/tcp   gentoo-distcc-tcp
 ```
 
-Any extra arguments are passed on verbatim to distccd. For instance, you can turn on the built-in HTTP statistics server:
+Command line arguments are passed on verbatim to distccd. For instance, you can turn on the built-in HTTP statistics server:
 ```shell
-docker run -d -p 3632-3633:3632-3633 --init --name gentoo-distcc-tcp --rm ksmanis/gentoo-distcc:tcp --stats
+docker run -d -p 3632-3633:3632-3633 --name gentoo-distcc-tcp --rm ksmanis/gentoo-distcc:tcp --stats
 ```
 
 The statistics server should now be accessible from all interfaces at port 3633 (`0.0.0.0:3633`):
 ```shell
 $ docker ps
 CONTAINER ID        IMAGE                       COMMAND                  CREATED             STATUS              PORTS                              NAMES
-04f5cf5eaa4a        ksmanis/gentoo-distcc:tcp   "distccd --daemon --…"   2 seconds ago       Up 1 second         0.0.0.0:3632-3633->3632-3633/tcp   gentoo-distcc-tcp
+4e553e359782        ksmanis/gentoo-distcc:tcp   "tini -e 143 -- dock…"   3 seconds ago       Up 2 seconds        0.0.0.0:3632-3633->3632-3633/tcp   gentoo-distcc-tcp
 ```
 
 For a full list of options refer to [distccd(1)](https://linux.die.net/man/1/distccd).
-
-*Note*: distccd is not designed to run as PID 1. As a result, it is highly recommended to use the [`--init`](https://docs.docker.com/engine/reference/run/#specify-an-init-process) docker run flag, as shown above, for distccd to behave correctly.
 
 ### SSH
 On the worker node(s), run the containerized SSH server (sshd):
