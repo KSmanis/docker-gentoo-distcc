@@ -13,6 +13,7 @@ Gentoo Docker image with distcc that can be used to speed up compilation jobs
   * `arm`
   * `arm64`
   * `ppc64`
+  * `x86`
 
 ## Usage
 distcc can run over TCP or SSH connections. TCP connections are fast but relatively insecure, whereas SSH connections are secure but slower. In a trusted environment, such as a LAN, you should use TCP connections for efficiency; otherwise use SSH connections.

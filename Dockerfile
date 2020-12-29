@@ -22,6 +22,7 @@ ARG TINI_VERSION=0.19.0
 ARG TINI_GPGKEY=595E85A6B1B4779EA4DAAEC70B588DFF0527A9B7
 RUN set -eux; \
     case "$TARGETPLATFORM" in \
+        "linux/386") TINI_ARCH="i386" ;; \
         "linux/amd64") TINI_ARCH="amd64" ;; \
         "linux/arm/v5") TINI_ARCH="armel" ;; \
         "linux/arm/v6" | "linux/arm/v7") TINI_ARCH="armhf" ;; \
