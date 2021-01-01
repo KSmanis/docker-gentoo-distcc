@@ -56,6 +56,22 @@ jobs:
       - name: Inspect distcc
         run: |
           docker run --rm ${{ steps.prep.outputs.IMAGE }} distcc --version
+      - name: Build test image
+        uses: docker/build-push-action@v2
+        with:
+          tags: ${{ steps.prep.outputs.IMAGE }}-test
+          platforms: linux/${{ matrix.arch }}
+          target: distcc-${{ matrix.target }}-test
+          load: true
+      - name: Test distcc
+        env:
+          IMAGE: ${{ steps.prep.outputs.IMAGE }}
+        run: |
+          if [ "${{ matrix.target }}" = "ssh" ]; then
+            AUTHORIZED_KEYS="$(docker run --rm ${{ steps.prep.outputs.IMAGE }}-test cat .ssh/id_rsa.pub)"
+            export AUTHORIZED_KEYS
+          fi
+          docker-compose -f docker-compose.test.yml up --abort-on-container-exit --exit-code-from distcc-${{ matrix.target }}-client distcc-${{ matrix.target }}-client
       - name: Login to DockerHub
         uses: docker/login-action@v1
         if: github.event_name == 'schedule'

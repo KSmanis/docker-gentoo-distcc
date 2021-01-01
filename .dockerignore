@@ -3,3 +3,4 @@
 # ...except the following
 !docker-entrypoint-ssh.sh
 !docker-entrypoint-tcp.sh
+!tests/

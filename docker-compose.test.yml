@@ -1,0 +1,23 @@
+---
+version: "3"
+
+services:
+  distcc-tcp-server:
+    image: ${IMAGE}
+  distcc-tcp-client:
+    depends_on:
+      - distcc-tcp-server
+    image: ${IMAGE}-test
+    environment:
+      - DISTCC_HOSTS=distcc-tcp-server
+
+  distcc-ssh-server:
+    image: ${IMAGE}
+    environment:
+      - AUTHORIZED_KEYS
+  distcc-ssh-client:
+    depends_on:
+      - distcc-ssh-server
+    image: ${IMAGE}-test
+    environment:
+      - DISTCC_HOSTS=distcc-ssh@distcc-ssh-server
