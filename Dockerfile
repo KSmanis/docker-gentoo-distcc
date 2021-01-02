@@ -1,8 +1,9 @@
+# syntax = docker/dockerfile:1.2-labs
 ARG BASE_TAG=latest
 FROM ksmanis/portage:$BASE_TAG AS portage
 FROM ksmanis/stage3:$BASE_TAG AS distcc-builder
 COPY --from=portage /var/db/repos/gentoo/ /var/db/repos/gentoo/
-RUN emerge -1q distcc
+RUN --security=sandbox emerge -1q distcc
 RUN rm -rf /var/cache/distfiles/* /var/db/repos/gentoo/
 
 FROM scratch AS distcc-builder-squashed
@@ -20,7 +21,8 @@ FROM distcc-builder-squashed AS distcc-tcp
 ARG TARGETPLATFORM
 ARG TINI_VERSION=0.19.0
 ARG TINI_GPGKEY=595E85A6B1B4779EA4DAAEC70B588DFF0527A9B7
-RUN set -eux; \
+RUN --security=sandbox \
+    set -eux; \
     case "$TARGETPLATFORM" in \
         "linux/386") TINI_ARCH="i386" ;; \
         "linux/amd64") TINI_ARCH="amd64" ;; \
@@ -66,5 +68,5 @@ ENV DISTCC_VERBOSE=1
 CMD ["./test.sh"]
 
 FROM distcc-tcp-test AS distcc-ssh-test
-RUN ssh-keygen -t rsa -b 4096 -N '' -f .ssh/id_rsa
+RUN ssh-keygen -t rsa -b 4096 -N '' -f ~/.ssh/id_rsa
 ENV DISTCC_SSH="ssh -o StrictHostKeyChecking=no -v"
