@@ -92,7 +92,8 @@ jobs:
       - name: Push image
         if: github.event_name == 'schedule'
         run: |
-          docker push "${DOCKERHUB_REPOSITORY}"
+          docker push "${{ steps.prep.outputs.IMAGE }}"
+          docker push "${{ steps.prep.outputs.IMAGE }}-${{ steps.prep.outputs.BUILD_DATE }}"
   build_manifests:
     strategy:
       matrix:
