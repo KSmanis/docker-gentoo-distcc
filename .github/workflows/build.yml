@@ -22,18 +22,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Preprocess Dockerfile
-        run: |
-          if [ "${{ matrix.arch }}" = "386" ]; then
-            sed -i 's/--security=sandbox/--security=insecure/g' Dockerfile
-          fi
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
-        if: matrix.arch != '386' && matrix.arch != 'amd64'
-      - name: Set up buildx
-        uses: docker/setup-buildx-action@v1
-        with:
-          buildkitd-flags: --allow-insecure-entitlement security.insecure
       - name: Prepare build variables
         id: prep
         run: |
@@ -42,9 +30,25 @@ jobs:
           ARCH=$(echo "${{ matrix.arch }}" | tr -d '/')
           TAG="${ARCH}-${{ matrix.target }}"
           IMAGE="${DOCKERHUB_REPOSITORY}:${TAG}"
+          QEMU_PLATFORM=$(echo "${{ matrix.arch }}" | cut -d '/' -f 1)
           echo ::set-output name=BUILD_DATE::${BUILD_DATE}
           echo ::set-output name=BUILD_DATETIME::${BUILD_DATETIME}
           echo ::set-output name=IMAGE::${IMAGE}
+          echo ::set-output name=QEMU_PLATFORM::${QEMU_PLATFORM}
+      - name: Preprocess Dockerfile
+        run: |
+          if [ "${{ matrix.arch }}" = "386" ]; then
+            sed -i 's/--security=sandbox/--security=insecure/g' Dockerfile
+          fi
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+        if: matrix.arch != '386' && matrix.arch != 'amd64'
+        with:
+          platforms: ${{ steps.prep.outputs.QEMU_PLATFORM }}
+      - name: Set up buildx
+        uses: docker/setup-buildx-action@v1
+        with:
+          buildkitd-flags: --allow-insecure-entitlement security.insecure
       - name: Build image
         uses: docker/build-push-action@v2
         with:
