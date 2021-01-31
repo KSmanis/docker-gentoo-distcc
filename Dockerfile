@@ -30,6 +30,7 @@ RUN --security=sandbox \
         "linux/arm/v6" | "linux/arm/v7") TINI_ARCH="armhf" ;; \
         "linux/arm64") TINI_ARCH="arm64" ;; \
         "linux/ppc64le") TINI_ARCH="ppc64le" ;; \
+        *) echo "Error: Unsupported TARGETPLATFORM '$TARGETPLATFORM'" >&2; exit 1 ;; \
     esac; \
     curl -fL "https://github.com/krallin/tini/releases/download/v${TINI_VERSION}/tini-${TINI_ARCH}" -o /usr/local/bin/tini; \
     curl -fL "https://github.com/krallin/tini/releases/download/v${TINI_VERSION}/tini-${TINI_ARCH}.asc" -o /usr/local/bin/tini.asc; \
