@@ -1,5 +1,5 @@
 ---
-blank_lines: false
-line_length: false
+line_length:
+  code_blocks: false
 no-duplicate-header:
   allow_different_nesting: true
