@@ -4,6 +4,7 @@ version: "3"
 services:
   distcc-tcp-server:
     image: ${IMAGE}
+    command: ["--verbose"]
   distcc-tcp-client:
     depends_on:
       - distcc-tcp-server
@@ -15,6 +16,7 @@ services:
     image: ${IMAGE}
     environment:
       - AUTHORIZED_KEYS
+      - SSHD_LOG_LEVEL=VERBOSE
   distcc-ssh-client:
     depends_on:
       - distcc-ssh-server

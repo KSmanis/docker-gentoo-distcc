@@ -86,7 +86,10 @@ jobs:
             AUTHORIZED_KEYS="$(docker run --rm ${{ steps.prep.outputs.IMAGE }}-test cat .ssh/id_rsa.pub)"
             export AUTHORIZED_KEYS
           fi
-          docker-compose -f docker-compose.test.yml up --abort-on-container-exit --exit-code-from distcc-${{ matrix.target }}-client distcc-${{ matrix.target }}-client
+          docker-compose -f docker-compose.test.yml up \
+            --abort-on-container-exit \
+            --exit-code-from distcc-${{ matrix.target }}-client \
+            distcc-${{ matrix.target }}-client distcc-${{ matrix.target }}-server
       - name: Login to DockerHub
         uses: docker/login-action@v1
         if: github.event_name == 'schedule'

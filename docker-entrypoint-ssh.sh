@@ -17,6 +17,10 @@ if [ "$1" = "sshd" ]; then
     chmod 600 "/home/${SSH_USERNAME}/.ssh/authorized_keys"
     # Create missing SSH host keys
     ssh-keygen -A
+    # Configure sshd
+    if [ -n "${SSHD_LOG_LEVEL}" ]; then
+      sed -i "/LogLevel/c\LogLevel ${SSHD_LOG_LEVEL}" /etc/ssh/sshd_config
+    fi
     # Execute sshd using absolute path
     shift
     exec /usr/sbin/sshd "$@"
