@@ -4,7 +4,7 @@ version: "3"
 services:
   distcc-tcp-server:
     image: ${IMAGE}
-    command: ["--verbose"]
+    command: ["--enable-tcp-insecure", "--verbose"]
   distcc-tcp-client:
     depends_on:
       - distcc-tcp-server
