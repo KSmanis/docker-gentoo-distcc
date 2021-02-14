@@ -36,10 +36,9 @@ jobs:
           echo ::set-output name=IMAGE::${IMAGE}
           echo ::set-output name=QEMU_PLATFORM::${QEMU_PLATFORM}
       - name: Preprocess Dockerfile
+        if: matrix.arch == '386'
         run: |
-          if [ "${{ matrix.arch }}" = "386" ]; then
-            sed -i 's/--security=sandbox/--security=insecure/g' Dockerfile
-          fi
+          sed -i 's/--security=sandbox/--security=insecure/g' Dockerfile
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
         if: matrix.arch != '386' && matrix.arch != 'amd64'
