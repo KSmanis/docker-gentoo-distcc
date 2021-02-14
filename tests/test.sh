@@ -25,7 +25,7 @@ retry() {
 
 # Compile
 gcc -c test.c -o test-gcc.o
-retry 5 distcc gcc -c test.c -o test-distcc.o
+retry 6 distcc gcc -c test.c -o test-distcc.o
 
 # Link
 gcc test-gcc.o -o test-gcc
