@@ -26,7 +26,6 @@ RUN --security=sandbox \
     case "$TARGETPLATFORM" in \
         "linux/386") TINI_ARCH="i386" ;; \
         "linux/amd64") TINI_ARCH="amd64" ;; \
-        "linux/arm/v5") TINI_ARCH="armel" ;; \
         "linux/arm/v6" | "linux/arm/v7") TINI_ARCH="armhf" ;; \
         "linux/arm64") TINI_ARCH="arm64" ;; \
         "linux/ppc64le") TINI_ARCH="ppc64le" ;; \
