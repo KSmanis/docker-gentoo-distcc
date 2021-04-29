@@ -1,21 +1,22 @@
 # Gentoo Docker image with distcc
 
+[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/KSmanis/docker-gentoo-distcc/master.svg)](https://results.pre-commit.ci/latest/github/KSmanis/docker-gentoo-distcc/master)
 [![build](https://github.com/KSmanis/docker-gentoo-distcc/workflows/build/badge.svg)](https://github.com/KSmanis/docker-gentoo-distcc/actions?workflow=build)
-[![lint](https://github.com/KSmanis/docker-gentoo-distcc/workflows/lint/badge.svg)](https://github.com/KSmanis/docker-gentoo-distcc/actions?workflow=lint)
+[![super-linter](https://github.com/KSmanis/docker-gentoo-distcc/workflows/super-linter/badge.svg)](https://github.com/KSmanis/docker-gentoo-distcc/actions?workflow=super-linter)
 
 Gentoo Docker image with distcc that can be used to speed up compilation jobs
 
 ## Features
 
-* Flexible deployment
-  * Locally (in a private network)
-  * Remotely (over the Internet)
-* Out-of-the-box support for the following Gentoo architectures:
-  * `amd64`
-  * `arm`
-  * `arm64`
-  * `ppc64`
-  * `x86`
+- Flexible deployment
+  - Locally (in a private network)
+  - Remotely (over the Internet)
+- Out-of-the-box support for the following Gentoo architectures:
+  - `amd64`
+  - `arm`
+  - `arm64`
+  - `ppc64`
+  - `x86`
 
 ## Usage
 
@@ -32,8 +33,8 @@ On the worker node(s), run the containerized distcc server (distccd):
 docker run -d -p 3632:3632 --name gentoo-distcc-tcp --rm ksmanis/gentoo-distcc:tcp
 ```
 
-distccd should now be accessible from all interfaces at port
-3632 (`0.0.0.0:3632`):
+distccd should now be accessible from all interfaces at port 3632
+(`0.0.0.0:3632`):
 
 ```shell
 $ docker ps
@@ -48,8 +49,8 @@ turn on the built-in HTTP statistics server:
 docker run -d -p 3632-3633:3632-3633 --name gentoo-distcc-tcp --rm ksmanis/gentoo-distcc:tcp --stats
 ```
 
-The statistics server should now be accessible from all interfaces at port
-3633 (`0.0.0.0:3633`):
+The statistics server should now be accessible from all interfaces at port 3633
+(`0.0.0.0:3633`):
 
 ```shell
 $ docker ps
@@ -57,8 +58,8 @@ CONTAINER ID        IMAGE                       COMMAND                  CREATED
 4e553e359782        ksmanis/gentoo-distcc:tcp   "tini -e 143 -- dock…"   3 seconds ago       Up 2 seconds        0.0.0.0:3632-3633->3632-3633/tcp   gentoo-distcc-tcp
 ```
 
-For a full list of options refer
-to [distccd(1)](https://linux.die.net/man/1/distccd).
+For a full list of options refer to
+[distccd(1)](https://linux.die.net/man/1/distccd).
 
 ### SSH
 
@@ -68,8 +69,8 @@ On the worker node(s), run the containerized SSH server (sshd):
 docker run -d -p 30022:22 -e AUTHORIZED_KEYS="..." --name gentoo-distcc-ssh --rm ksmanis/gentoo-distcc:ssh
 ```
 
-sshd should now be accessible from all interfaces at port
-30022 (`0.0.0.0:30022`):
+sshd should now be accessible from all interfaces at port 30022
+(`0.0.0.0:30022`):
 
 ```shell
 $ docker ps
