@@ -19,6 +19,7 @@ LABEL org.opencontainers.image.title="gentoo-distcc" \
 
 FROM distcc-builder-squashed AS distcc-tcp
 ARG TARGETPLATFORM
+# renovate datasource=github-tags depName=krallin/tini
 ARG TINI_VERSION=0.19.0
 ARG TINI_GPGKEY=595E85A6B1B4779EA4DAAEC70B588DFF0527A9B7
 RUN --security=sandbox \
