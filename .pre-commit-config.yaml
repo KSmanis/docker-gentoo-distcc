@@ -31,7 +31,6 @@ repos:
     rev: v0.27.1
     hooks:
       - id: markdownlint
-        args: ["--config", ".github/linters/.markdown-lint.yml"]
   - repo: https://github.com/executablebooks/mdformat
     rev: 0.7.5
     hooks:
