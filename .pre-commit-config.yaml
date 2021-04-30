@@ -11,6 +11,14 @@ repos:
     hooks:
       - id: end-of-file-fixer
       - id: trailing-whitespace
+  # Docker
+  - repo: local
+    hooks:
+      - id: hadolint
+        name: hadolint
+        language: docker_image
+        types: [dockerfile]
+        entry: hadolint/hadolint:latest hadolint
   # Markdown
   - repo: https://github.com/igorshubovych/markdownlint-cli
     rev: v0.27.1
