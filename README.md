@@ -1,7 +1,7 @@
 # Gentoo Docker image with distcc
 
-[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/KSmanis/docker-gentoo-distcc/master.svg)](https://results.pre-commit.ci/latest/github/KSmanis/docker-gentoo-distcc/master)
 [![build](https://github.com/KSmanis/docker-gentoo-distcc/workflows/build/badge.svg)](https://github.com/KSmanis/docker-gentoo-distcc/actions?workflow=build)
+[![pre-commit](https://github.com/KSmanis/docker-gentoo-distcc/workflows/pre-commit/badge.svg)](https://github.com/KSmanis/docker-gentoo-distcc/actions?workflow=pre-commit)
 [![super-linter](https://github.com/KSmanis/docker-gentoo-distcc/workflows/super-linter/badge.svg)](https://github.com/KSmanis/docker-gentoo-distcc/actions?workflow=super-linter)
 
 Gentoo Docker image with distcc that can be used to speed up compilation jobs
