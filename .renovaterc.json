@@ -2,5 +2,16 @@
   "dependencyDashboard": true,
   "extends": [
     "config:base"
+  ],
+  "packageRules": [
+    {
+      "matchDatasources": [
+        "github-tags"
+      ],
+      "matchPackageNames": [
+        "shellcheck-py/shellcheck-py"
+      ],
+      "versioning": "loose"
+    }
   ]
 }
