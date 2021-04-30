@@ -26,7 +26,7 @@ repos:
       - id: markdownlint
         args: ["--config", ".github/linters/.markdown-lint.yml"]
   - repo: https://github.com/executablebooks/mdformat
-    rev: 0.7.4
+    rev: 0.7.5
     hooks:
       - id: mdformat
         additional_dependencies:
