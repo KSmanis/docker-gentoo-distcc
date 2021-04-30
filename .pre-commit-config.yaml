@@ -19,6 +19,13 @@ repos:
         language: docker_image
         types: [dockerfile]
         entry: hadolint/hadolint:latest hadolint
+  # JSON
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v3.4.0
+    hooks:
+      - id: check-json
+      - id: pretty-format-json
+        args: [--autofix]
   # Markdown
   - repo: https://github.com/igorshubovych/markdownlint-cli
     rev: v0.27.1
