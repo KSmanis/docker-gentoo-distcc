@@ -1,3 +1,5 @@
+/* Copyright (C) 2021 Konstantinos Smanis <konstantinos.smanis@gmail.com> */
+
 #include <stdio.h>
 
 int main() {
