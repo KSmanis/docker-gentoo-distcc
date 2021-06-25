@@ -37,7 +37,7 @@ RUN --security=sandbox \
     curl -fL "https://github.com/krallin/tini/releases/download/v${TINI_VERSION}/tini-${TINI_ARCH}.sha256sum" -o /usr/local/bin/tini.sha256sum; \
     GNUPGHOME="$(mktemp -d)"; \
     export GNUPGHOME; \
-    gpg --batch --keyserver ha.pool.sks-keyservers.net --recv-keys "${TINI_GPGKEY}"; \
+    gpg --batch --keyserver keyserver.ubuntu.com --recv-keys "${TINI_GPGKEY}"; \
     gpg --batch --verify /usr/local/bin/tini.asc /usr/local/bin/tini; \
     gpgconf --kill all; \
     sed -i "s#tini-${TINI_ARCH}#/usr/local/bin/tini#" /usr/local/bin/tini.sha256sum; \
