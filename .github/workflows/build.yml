@@ -84,7 +84,7 @@ jobs:
           IMAGE: ${{ steps.prep.outputs.IMAGE }}
         run: |
           if [ "${{ matrix.target }}" = "ssh" ]; then
-            AUTHORIZED_KEYS="$(docker run --rm ${{ steps.prep.outputs.IMAGE }}-test cat .ssh/id_rsa.pub)"
+            AUTHORIZED_KEYS="$(docker run --rm ${{ steps.prep.outputs.IMAGE }}-test cat .ssh/id_ed25519.pub)"
             export AUTHORIZED_KEYS
           fi
           docker-compose -f docker-compose.test.yml up \

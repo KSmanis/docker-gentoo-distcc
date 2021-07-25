@@ -22,4 +22,4 @@ services:
       - distcc-ssh-server
     image: ${IMAGE}-test
     environment:
-      - DISTCC_HOSTS=distcc-ssh@distcc-ssh-server
+      - DISTCC_HOSTS=@distcc-ssh-server

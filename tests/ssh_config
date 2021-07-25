@@ -1,0 +1,4 @@
+Host distcc-ssh-server
+    LogLevel VERBOSE
+    StrictHostKeyChecking accept-new
+    User distcc-ssh

@@ -69,5 +69,7 @@ ENV DISTCC_VERBOSE=1
 CMD ["./test.sh"]
 
 FROM distcc-tcp-test AS distcc-ssh-test
-RUN ssh-keygen -t rsa -b 4096 -N '' -f ~/.ssh/id_rsa
-ENV DISTCC_SSH="ssh -o StrictHostKeyChecking=no -v"
+ARG TEST_USERNAME=notroot
+RUN ssh-keygen -t ed25519 -N '' -f ~/.ssh/id_ed25519
+COPY --chown=${TEST_USERNAME}:${TEST_USERNAME} tests/ssh_config .ssh/config
+RUN chmod 600 .ssh/config
