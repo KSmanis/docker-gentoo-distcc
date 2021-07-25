@@ -7,7 +7,8 @@ services:
     command: ["--enable-tcp-insecure", "--verbose"]
   distcc-tcp-client:
     depends_on:
-      - distcc-tcp-server
+      distcc-tcp-server:
+        condition: service_healthy
     image: ${IMAGE}-test
     environment:
       - DISTCC_HOSTS=distcc-tcp-server
@@ -19,7 +20,8 @@ services:
       - SSHD_LOG_LEVEL=VERBOSE
   distcc-ssh-client:
     depends_on:
-      - distcc-ssh-server
+      distcc-ssh-server:
+        condition: service_healthy
     image: ${IMAGE}-test
     environment:
       - DISTCC_HOSTS=@distcc-ssh-server

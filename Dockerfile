@@ -49,12 +49,14 @@ COPY docker-entrypoint-tcp.sh /usr/local/bin/docker-entrypoint.sh
 # distccd exits with code 143 for SIGTERM; remap it to 0
 ENTRYPOINT ["tini", "-e", "143", "--", "docker-entrypoint.sh"]
 EXPOSE 3632
+HEALTHCHECK CMD </dev/tcp/localhost/3632 || exit 1
 
 FROM distcc-builder-squashed AS distcc-ssh
 ENV SSH_USERNAME=distcc-ssh
 COPY docker-entrypoint-ssh.sh /usr/local/bin/docker-entrypoint.sh
 ENTRYPOINT ["docker-entrypoint.sh"]
 EXPOSE 22
+HEALTHCHECK CMD </dev/tcp/localhost/22 || exit 1
 
 FROM distcc-builder-squashed AS distcc-tcp-test
 ARG TEST_USERNAME=notroot
