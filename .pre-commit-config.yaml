@@ -13,13 +13,10 @@ repos:
       - id: end-of-file-fixer
       - id: trailing-whitespace
   # Docker
-  - repo: local
+  - repo: https://github.com/hadolint/hadolint
+    rev: v2.6.0
     hooks:
-      - id: hadolint
-        name: hadolint
-        language: docker_image
-        types: [dockerfile]
-        entry: hadolint/hadolint:latest hadolint
+      - id: hadolint-docker
   # JSON
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.0.1
