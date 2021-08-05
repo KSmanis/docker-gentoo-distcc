@@ -18,7 +18,7 @@ if [ "$1" = "sshd" ]; then
     # Create missing SSH host keys
     ssh-keygen -A
     # Configure sshd
-    if [ -n "${SSHD_LOG_LEVEL}" ]; then
+    if [ -n "${SSHD_LOG_LEVEL+x}" ]; then
       sed -i "/LogLevel/c\LogLevel ${SSHD_LOG_LEVEL}" /etc/ssh/sshd_config
     fi
     # Execute sshd using absolute path
