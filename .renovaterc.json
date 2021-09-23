@@ -1,36 +1,6 @@
 {
-  "dependencyDashboard": true,
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:base"
-  ],
-  "packageRules": [
-    {
-      "matchDatasources": [
-        "github-tags"
-      ],
-      "matchPackageNames": [
-        "shellcheck-py/shellcheck-py"
-      ],
-      "versioning": "loose"
-    },
-    {
-      "automerge": true,
-      "automergeType": "branch",
-      "matchManagers": [
-        "github-actions",
-        "pre-commit"
-      ]
-    }
-  ],
-  "regexManagers": [
-    {
-      "fileMatch": [
-        "(^|/|\\.)Dockerfile$",
-        "(^|/)Dockerfile\\.[^/]*$"
-      ],
-      "matchStrings": [
-        "# renovate datasource=(?<datasource>.*?) depName=(?<depName>.*?)( versioning=(?<versioning>.*?))?\\s(ARG|ENV) .*?_VERSION=\"?(?<currentValue>.*?)\"?\\s"
-      ]
-    }
+    "KSmanis/renovate-config"
   ]
 }
