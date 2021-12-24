@@ -7,7 +7,7 @@ repos:
       - id: check-useless-excludes
   # Generic
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.0.1
+    rev: v4.1.0
     hooks:
       - id: check-shebang-scripts-are-executable
       - id: end-of-file-fixer
@@ -19,7 +19,7 @@ repos:
       - id: hadolint-docker
   # JSON
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.0.1
+    rev: v4.1.0
     hooks:
       - id: check-json
       - id: pretty-format-json
