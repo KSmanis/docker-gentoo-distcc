@@ -3,6 +3,7 @@
 [![Renovate enabled](https://img.shields.io/badge/renovate-enabled-brightgreen.svg)](https://renovatebot.com/)
 [![build](https://github.com/KSmanis/docker-gentoo-distcc/workflows/build/badge.svg)](https://github.com/KSmanis/docker-gentoo-distcc/actions?workflow=build)
 [![pre-commit](https://github.com/KSmanis/docker-gentoo-distcc/workflows/pre-commit/badge.svg)](https://github.com/KSmanis/docker-gentoo-distcc/actions?workflow=pre-commit)
+[![super-linter](https://github.com/KSmanis/docker-gentoo-distcc/workflows/super-linter/badge.svg)](https://github.com/KSmanis/docker-gentoo-distcc/actions?workflow=super-linter)
 
 Gentoo Docker image with distcc that can be used to speed up compilation jobs
 
@@ -10,7 +11,7 @@ Gentoo Docker image with distcc that can be used to speed up compilation jobs
 
 - Flexible deployment
   - Locally (in a private network)
-  - Remotely (over the Internet)
+  - Remotely (over the internet)
 - Out-of-the-box support for the following Gentoo architectures:
   - `amd64`
   - `arm`
@@ -42,7 +43,7 @@ CONTAINER ID        IMAGE                       COMMAND                  CREATED
 405bb6e87ce8        ksmanis/gentoo-distcc:tcp   "tini -e 143 -- dock…"   2 seconds ago       Up 2 seconds        0.0.0.0:3632->3632/tcp   gentoo-distcc-tcp
 ```
 
-Command line arguments are passed on verbatim to distccd. For instance, you can
+Command-line arguments are passed on verbatim to distccd. For instance, you can
 turn on the built-in HTTP statistics server:
 
 ```shell
@@ -85,7 +86,7 @@ prefer to read it from a file on the Docker host:
 docker run -d -p 30022:22 -e AUTHORIZED_KEYS="$(cat /path/to/key.pub)" --name gentoo-distcc-ssh --rm ksmanis/gentoo-distcc:ssh
 ```
 
-Command line arguments are passed on verbatim to sshd. For a full list of
+Command-line arguments are passed on verbatim to sshd. For a full list of
 options refer to [sshd(8)](https://linux.die.net/man/8/sshd).
 
 #### Security
