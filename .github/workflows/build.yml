@@ -32,10 +32,10 @@ jobs:
           TAG="${ARCH}-${{ matrix.target }}"
           IMAGE="${DOCKERHUB_REPOSITORY}:${TAG}"
           QEMU_PLATFORM=$(echo "${{ matrix.arch }}" | cut -d '/' -f 1)
-          echo ::set-output name=BUILD_DATE::${BUILD_DATE}
-          echo ::set-output name=BUILD_DATETIME::${BUILD_DATETIME}
-          echo ::set-output name=IMAGE::${IMAGE}
-          echo ::set-output name=QEMU_PLATFORM::${QEMU_PLATFORM}
+          echo "::set-output name=BUILD_DATE::${BUILD_DATE}"
+          echo "::set-output name=BUILD_DATETIME::${BUILD_DATETIME}"
+          echo "::set-output name=IMAGE::${IMAGE}"
+          echo "::set-output name=QEMU_PLATFORM::${QEMU_PLATFORM}"
       - name: Preprocess Dockerfile
         if: matrix.arch == '386'
         run: |
