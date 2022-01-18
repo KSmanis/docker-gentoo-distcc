@@ -1,9 +1,9 @@
 # Gentoo Docker image with distcc
 
+[![build](https://github.com/KSmanis/docker-gentoo-distcc/actions/workflows/build.yml/badge.svg)](https://github.com/KSmanis/docker-gentoo-distcc/actions/workflows/build.yml)
+[![lint](https://github.com/KSmanis/docker-gentoo-distcc/actions/workflows/lint.yml/badge.svg)](https://github.com/KSmanis/docker-gentoo-distcc/actions/workflows/lint.yml)
+[![pre-commit enabled](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 [![Renovate enabled](https://img.shields.io/badge/renovate-enabled-brightgreen.svg)](https://renovatebot.com/)
-[![build](https://github.com/KSmanis/docker-gentoo-distcc/workflows/build/badge.svg)](https://github.com/KSmanis/docker-gentoo-distcc/actions?workflow=build)
-[![pre-commit](https://github.com/KSmanis/docker-gentoo-distcc/workflows/pre-commit/badge.svg)](https://github.com/KSmanis/docker-gentoo-distcc/actions?workflow=pre-commit)
-[![super-linter](https://github.com/KSmanis/docker-gentoo-distcc/workflows/super-linter/badge.svg)](https://github.com/KSmanis/docker-gentoo-distcc/actions?workflow=super-linter)
 
 Gentoo Docker image with distcc that can be used to speed up compilation jobs
 
