@@ -17,6 +17,11 @@ repos:
     rev: v2.8.0
     hooks:
       - id: hadolint-docker
+  # Git
+  - repo: https://github.com/jorisroovers/gitlint
+    rev: v0.17.0
+    hooks:
+      - id: gitlint
   # GitHub Actions
   - repo: https://github.com/rhysd/actionlint
     rev: v1.6.8

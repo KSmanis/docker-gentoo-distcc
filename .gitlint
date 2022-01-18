@@ -1,0 +1,9 @@
+[general]
+contrib=contrib-title-conventional-commits
+ignore=body-is-missing
+
+[body-max-line-length]
+line-length=72
+
+[ignore-body-lines]
+regex=^(\[.+\]:? )?https?://

@@ -4,6 +4,22 @@ name: lint
 on: [push, pull_request]
 
 jobs:
+  gitlint:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+      - name: Install gitlint
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install gitlint
+      - name: Run gitlint
+        run: |
+          gitlint
+
   pre-commit:
     runs-on: ubuntu-latest
     steps:
