@@ -15,7 +15,7 @@ repos:
       - id: trailing-whitespace
   # Docker
   - repo: https://github.com/hadolint/hadolint
-    rev: v2.8.0
+    rev: v2.9.0
     hooks:
       - id: hadolint-docker
   # Git
