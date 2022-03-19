@@ -9,5 +9,4 @@ line-length=72
 regex=^(\[.+\]:? )?https?://
 
 [ignore-by-author-name]
-regex=Renovate Bot
-ignore=title-max-length,body-is-missing
+regex=[Rr]enovate
