@@ -46,7 +46,7 @@ jobs:
         with:
           platforms: ${{ steps.prep.outputs.QEMU_PLATFORM }}
       - name: Set up buildx
-        uses: docker/setup-buildx-action@v1
+        uses: docker/setup-buildx-action@v2
         with:
           buildkitd-flags: --allow-insecure-entitlement security.insecure
       - name: Build image
