@@ -41,7 +41,7 @@ jobs:
         run: |
           sed -i 's/--security=sandbox/--security=insecure/g' Dockerfile
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
+        uses: docker/setup-qemu-action@v2
         if: matrix.arch != '386' && matrix.arch != 'amd64'
         with:
           platforms: ${{ steps.prep.outputs.QEMU_PLATFORM }}
