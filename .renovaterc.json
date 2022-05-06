@@ -3,5 +3,8 @@
   "extends": [
     "KSmanis/renovate-config"
   ],
+  "schedule": [
+    "after 9am"
+  ],
   "semanticCommits": "enabled"
 }
