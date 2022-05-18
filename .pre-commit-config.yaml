@@ -25,7 +25,7 @@ repos:
       - id: gitlint
   # GitHub Actions
   - repo: https://github.com/rhysd/actionlint
-    rev: v1.6.12
+    rev: v1.6.13
     hooks:
       - id: actionlint-docker
   # JSON
