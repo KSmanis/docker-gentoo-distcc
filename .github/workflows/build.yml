@@ -3,7 +3,7 @@ name: build
 
 on:
   schedule:
-    - cron: '0 3 * * *'
+    - cron: '0 2 * * 1'
   push:
   pull_request:
 
