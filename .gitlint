@@ -1,6 +1,7 @@
 [general]
 contrib=contrib-title-conventional-commits
 ignore=body-is-missing
+regex-style-search=true
 
 [body-max-line-length]
 line-length=72

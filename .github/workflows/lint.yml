@@ -4,35 +4,30 @@ name: lint
 on: [push, pull_request]
 
 jobs:
-  gitlint:
-    if: github.event_name != 'pull_request'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out code
-        uses: actions/checkout@v3
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: 3
-      - name: Install gitlint
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install gitlint
-      - name: Run gitlint
-        run: |
-          gitlint
-
   pre-commit:
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
         uses: actions/checkout@v3
-      - name: Set up Python
-        uses: actions/setup-python@v4
         with:
-          python-version: 3
+          fetch-depth: 2
+      - name: Install pre-commit
+        run: pipx install pre-commit
+      - name: Cache pre-commit hooks
+        id: cache-pre-commit
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pre-commit
+          key: pre-commit-${{ hashFiles('.pre-commit-config.yaml') }}
+          restore-keys: pre-commit-
+      - name: Prune pre-commit hooks
+        if: steps.cache-pre-commit.outputs.cache-hit != 'true'
+        run: pre-commit gc
+      - name: Run gitlint
+        run: pre-commit run --color=always --hook-stage manual gitlint-ci
       - name: Run pre-commit
-        uses: pre-commit/action@v3.0.0
+        if: success() || failure()
+        run: pre-commit run --all-files --color=always --show-diff-on-failure
 
   super-linter:
     runs-on: ubuntu-latest

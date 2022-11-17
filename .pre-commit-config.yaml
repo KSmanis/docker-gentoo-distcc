@@ -23,6 +23,7 @@ repos:
     rev: v0.18.0
     hooks:
       - id: gitlint
+      - id: gitlint-ci
   # GitHub Actions
   - repo: https://github.com/rhysd/actionlint
     rev: v1.6.22
