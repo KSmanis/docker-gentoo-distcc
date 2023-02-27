@@ -6,6 +6,11 @@ on:
     - cron: '0 2 * * 1'
   push:
   pull_request:
+  workflow_dispatch:
+    inputs:
+      push:
+        type: boolean
+        description: Push built images to Docker Hub
 
 env:
   DOCKERHUB_REPOSITORY: ksmanis/gentoo-distcc
@@ -19,7 +24,7 @@ jobs:
         target: ["tcp", "ssh"]
     name: ${{ matrix.arch }}:${{ matrix.target }} image
     runs-on: ubuntu-latest
-    continue-on-error: ${{ github.event_name == 'schedule' }}
+    continue-on-error: ${{ github.event_name == 'schedule' || inputs.push }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -94,12 +99,12 @@ jobs:
             distcc-${{ matrix.target }}-client distcc-${{ matrix.target }}-server
       - name: Login to DockerHub
         uses: docker/login-action@v2
-        if: github.event_name == 'schedule'
+        if: github.event_name == 'schedule' || inputs.push
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
       - name: Push image
-        if: github.event_name == 'schedule'
+        if: github.event_name == 'schedule' || inputs.push
         run: |
           docker push "${{ steps.prep.outputs.IMAGE }}"
           docker push "${{ steps.prep.outputs.IMAGE }}-${{ steps.prep.outputs.BUILD_DATE }}"
@@ -110,7 +115,7 @@ jobs:
     name: ${{ matrix.target }} manifest
     runs-on: ubuntu-latest
     needs: build_images
-    if: github.event_name == 'schedule'
+    if: github.event_name == 'schedule' || inputs.push
     steps:
       - name: Login to DockerHub
         uses: docker/login-action@v2
@@ -141,7 +146,7 @@ jobs:
     name: README
     runs-on: ubuntu-latest
     needs: build_manifests
-    if: github.event_name == 'schedule'
+    if: github.event_name == 'schedule' || inputs.push
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
