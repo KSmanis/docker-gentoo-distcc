@@ -1,10 +1,10 @@
-# syntax = docker/dockerfile:1.2-labs
 ARG BASE_TAG=latest
 FROM ksmanis/portage:$BASE_TAG AS portage
 FROM ksmanis/stage3:$BASE_TAG AS distcc-builder
 COPY --from=portage /var/db/repos/gentoo/ /var/db/repos/gentoo/
-RUN --security=sandbox emerge -1q distcc
-RUN rm -rf /var/cache/distfiles/* /var/db/repos/gentoo/
+RUN set -eux; \
+    emerge -1q distcc; \
+    rm -rf /var/cache/distfiles/* /var/db/repos/gentoo/
 
 FROM scratch AS distcc-builder-squashed
 COPY --from=distcc-builder / /
@@ -22,8 +22,7 @@ ARG TARGETPLATFORM
 # renovate datasource=github-tags depName=krallin/tini
 ARG TINI_VERSION=0.19.0
 ARG TINI_GPGKEY=595E85A6B1B4779EA4DAAEC70B588DFF0527A9B7
-RUN --security=sandbox \
-    set -eux; \
+RUN set -eux; \
     case "$TARGETPLATFORM" in \
         "linux/386") TINI_ARCH="i386" ;; \
         "linux/amd64") TINI_ARCH="amd64" ;; \
