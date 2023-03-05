@@ -54,9 +54,15 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
-          build-args: |
-            BUILD_DATETIME=${{ steps.prep.outputs.BUILD_DATETIME }}
-            VCS_REF=${{ github.sha }}
+          labels: |
+            org.opencontainers.image.title=gentoo-distcc
+            org.opencontainers.image.description=Gentoo Docker image with distcc that can be used to speed up compilation jobs
+            org.opencontainers.image.authors=Konstantinos Smanis <konstantinos.smanis@gmail.com>
+            org.opencontainers.image.documentation=https://github.com/KSmanis/docker-gentoo-distcc
+            org.opencontainers.image.source=https://github.com/KSmanis/docker-gentoo-distcc
+            org.opencontainers.image.url=https://github.com/KSmanis/docker-gentoo-distcc
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.created=${{ steps.prep.outputs.BUILD_DATETIME }}
           tags: |
             ${{ steps.prep.outputs.IMAGE }}
             ${{ steps.prep.outputs.IMAGE }}-${{ steps.prep.outputs.BUILD_DATE }}

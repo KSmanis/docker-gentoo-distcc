@@ -1,23 +1,11 @@
 ARG BASE_TAG=latest
-FROM ksmanis/portage:$BASE_TAG AS portage
 FROM ksmanis/stage3:$BASE_TAG AS distcc-builder
-COPY --from=portage /var/db/repos/gentoo/ /var/db/repos/gentoo/
 RUN set -eux; \
-    emerge -1q distcc; \
+    emerge --sync; \
+    emerge --quiet-build -tv distcc; \
     rm -rf /var/cache/distfiles/* /var/db/repos/gentoo/
 
-FROM scratch AS distcc-builder-squashed
-COPY --from=distcc-builder / /
-ARG BUILD_DATETIME
-ARG VCS_REF
-LABEL org.opencontainers.image.title="gentoo-distcc" \
-      org.opencontainers.image.description="Gentoo Docker image with distcc that can be used to speed up compilation jobs" \
-      org.opencontainers.image.authors="Konstantinos Smanis <konstantinos.smanis@gmail.com>" \
-      org.opencontainers.image.source="https://github.com/KSmanis/docker-gentoo-distcc" \
-      org.opencontainers.image.revision="$VCS_REF" \
-      org.opencontainers.image.created="$BUILD_DATETIME"
-
-FROM distcc-builder-squashed AS distcc-tcp
+FROM distcc-builder AS distcc-tcp
 ARG TARGETPLATFORM
 # renovate datasource=github-tags depName=krallin/tini
 ARG TINI_VERSION=0.19.0
@@ -50,14 +38,14 @@ ENTRYPOINT ["tini", "-e", "143", "--", "docker-entrypoint.sh"]
 EXPOSE 3632
 HEALTHCHECK CMD </dev/tcp/localhost/3632 || exit 1
 
-FROM distcc-builder-squashed AS distcc-ssh
+FROM distcc-builder AS distcc-ssh
 ENV SSH_USERNAME=distcc-ssh
 COPY docker-entrypoint-ssh.sh /usr/local/bin/docker-entrypoint.sh
 ENTRYPOINT ["docker-entrypoint.sh"]
 EXPOSE 22
 HEALTHCHECK CMD </dev/tcp/localhost/22 || exit 1
 
-FROM distcc-builder-squashed AS distcc-tcp-test
+FROM distcc-builder AS distcc-tcp-test
 ARG TEST_USERNAME=notroot
 RUN useradd ${TEST_USERNAME}
 WORKDIR /home/${TEST_USERNAME}/
