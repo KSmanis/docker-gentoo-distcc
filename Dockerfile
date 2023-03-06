@@ -1,6 +1,7 @@
 ARG BASE_TAG=latest
 FROM ksmanis/stage3:$BASE_TAG AS distcc-builder
 RUN set -eux; \
+    printf '[gentoo]\nsync-type = webrsync\n' > /etc/portage/repos.conf; \
     emerge --sync; \
     emerge --quiet-build -tv distcc; \
     rm -rf /var/cache/distfiles/* /var/db/repos/gentoo/
