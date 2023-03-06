@@ -3,8 +3,10 @@ FROM ksmanis/stage3:$BASE_TAG AS distcc-builder
 RUN set -eux; \
     printf '[gentoo]\nsync-type = webrsync\n' > /etc/portage/repos.conf; \
     emerge --sync; \
+    emerge --info; \
     emerge --quiet-build -tv distcc; \
-    rm -rf /var/cache/distfiles/* /var/db/repos/gentoo/
+    rm -rf /var/cache/distfiles/ /var/db/repos/gentoo/; \
+    distcc --version
 
 FROM distcc-builder AS distcc-tcp
 ARG TARGETPLATFORM
