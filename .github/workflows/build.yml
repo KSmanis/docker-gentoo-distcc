@@ -66,6 +66,8 @@ jobs:
           tags: |
             ${{ steps.prep.outputs.IMAGE }}
             ${{ steps.prep.outputs.IMAGE }}-${{ steps.prep.outputs.BUILD_DATE }}
+            ghcr.io/${{ steps.prep.outputs.IMAGE }}
+            ghcr.io/${{ steps.prep.outputs.IMAGE }}-${{ steps.prep.outputs.BUILD_DATE }}
           platforms: linux/${{ matrix.arch }}
           target: distcc-${{ matrix.target }}
           load: true
@@ -92,17 +94,26 @@ jobs:
             --abort-on-container-exit \
             --exit-code-from distcc-${{ matrix.target }}-client \
             distcc-${{ matrix.target }}-client distcc-${{ matrix.target }}-server
-      - name: Login to DockerHub
+      - name: Log in to Docker Hub
         uses: docker/login-action@v2
         if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.push)
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
+      - name: Log in to GitHub Container registry
+        uses: docker/login-action@v2
+        if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.push)
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       - name: Push image
         if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.push)
         run: |
           docker push "${{ steps.prep.outputs.IMAGE }}"
           docker push "${{ steps.prep.outputs.IMAGE }}-${{ steps.prep.outputs.BUILD_DATE }}"
+          docker push "ghcr.io/${{ steps.prep.outputs.IMAGE }}"
+          docker push "ghcr.io/${{ steps.prep.outputs.IMAGE }}-${{ steps.prep.outputs.BUILD_DATE }}"
   build_manifests:
     strategy:
       matrix:
@@ -112,11 +123,17 @@ jobs:
     needs: build_images
     if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.push)
     steps:
-      - name: Login to DockerHub
+      - name: Log in to Docker Hub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
+      - name: Log in to GitHub Container registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build and push manifest list
         env:
           DOCKER_CLI_EXPERIMENTAL: enabled
@@ -136,6 +153,7 @@ jobs:
             done
             docker manifest create "${MANIFEST}" "${IMAGES[@]}"
             docker manifest push "${MANIFEST}"
+            docker manifest push "ghcr.io/${MANIFEST}"
           done
   update_readme:
     name: README
