@@ -152,7 +152,7 @@ jobs:
               fi
             done
             docker manifest create "${MANIFEST}" "${IMAGES[@]}"
-            docker manifest create "ghcr.io/${MANIFEST}" "${IMAGES[@]}"
+            docker manifest create "ghcr.io/${MANIFEST}" "${IMAGES[@]/#/ghcr.io/}"
             docker manifest push "${MANIFEST}"
             docker manifest push "ghcr.io/${MANIFEST}"
           done
