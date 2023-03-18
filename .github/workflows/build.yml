@@ -10,7 +10,7 @@ on:
     inputs:
       push:
         type: boolean
-        description: Push built images to Docker Hub
+        description: Push built images
 
 env:
   DOCKERHUB_REPOSITORY: ksmanis/gentoo-distcc
