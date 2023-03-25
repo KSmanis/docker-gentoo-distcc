@@ -26,7 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     continue-on-error: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.push) }}
     steps:
-      - name: Checkout code
+      - name: Check out code
         uses: actions/checkout@v3
       - name: Prepare build variables
         id: prep
@@ -117,18 +117,29 @@ jobs:
   build_manifests:
     strategy:
       matrix:
+        registry: ["docker.io", "ghcr.io"]
         target: ["tcp", "ssh"]
-    name: ${{ matrix.target }} manifest
+        dated: [true, false]
+    name: ${{ matrix.registry }}:${{ matrix.target }} manifest (dated=${{ matrix.dated }})
     runs-on: ubuntu-latest
     needs: build_images
     if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.push)
     steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+      - name: Prepare build variables
+        id: prep
+        if: matrix.dated
+        run: |
+          echo "BUILD_DATE=$(date -u +'%Y%m%d')" >> "$GITHUB_OUTPUT"
       - name: Log in to Docker Hub
+        if: matrix.registry == 'docker.io'
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
       - name: Log in to GitHub Container registry
+        if: matrix.registry == 'ghcr.io'
         uses: docker/login-action@v2
         with:
           registry: ghcr.io
@@ -136,23 +147,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build and push manifest list
         env:
-          DOCKER_CLI_EXPERIMENTAL: enabled
+          REPO: ${{ matrix.registry }}/${{ env.DOCKERHUB_REPOSITORY }}
+          TAG: ${{ matrix.dated && format('{0}-{1}', matrix.target, steps.prep.outputs.BUILD_DATE) || matrix.target }}
         run: |
-          ARCHES=("386" "amd64" "armv6" "armv7" "arm64" "ppc64le")
-          BUILD_DATE=$(date -u +'%Y%m%d')
-          MANIFEST_TAGS=("${{ matrix.target }}" "${{ matrix.target }}-${BUILD_DATE}")
-
-          for MANIFEST_TAG in "${MANIFEST_TAGS[@]}"; do
-            MANIFEST="${DOCKERHUB_REPOSITORY}:${MANIFEST_TAG}"
-            IMAGES=()
-            for ARCH in "${ARCHES[@]}"; do
-              IMAGE="${DOCKERHUB_REPOSITORY}:${ARCH}-${MANIFEST_TAG}"
-              if docker manifest inspect "${IMAGE}" 1>/dev/null 2>&1; then
-                IMAGES+=("${IMAGE}")
-              fi
-            done
-            docker manifest create "${MANIFEST}" "${IMAGES[@]}"
-            docker manifest create "ghcr.io/${MANIFEST}" "${IMAGES[@]/#/ghcr.io/}"
-            docker manifest push "${MANIFEST}"
-            docker manifest push "ghcr.io/${MANIFEST}"
-          done
+          ./build-manifest.sh
