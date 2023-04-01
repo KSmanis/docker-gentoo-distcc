@@ -13,7 +13,7 @@ env:
   DOCKERHUB_USERNAME: ksmanis
 
 jobs:
-  build_images:
+  images:
     strategy:
       fail-fast: false
       matrix:
@@ -109,8 +109,8 @@ jobs:
         run: |
           docker push --all-tags "${DOCKERHUB_REPOSITORY}"
           docker push --all-tags "ghcr.io/${DOCKERHUB_REPOSITORY}"
-  build_manifests:
-    needs: build_images
+  manifests:
+    needs: images
     strategy:
       fail-fast: false
       matrix:
@@ -126,9 +126,9 @@ jobs:
         id: prep
         run: |
           if [ '${{ matrix.tag }}' = 'latest' ]; then
-            TAG="$(echo "${{ needs.build_images.outputs.tags }}" | head -1)"
+            TAG="$(echo "${{ needs.images.outputs.tags }}" | head -1)"
           elif [ '${{ matrix.tag }}' = 'versioned' ]; then
-            TAG="$(echo "${{ needs.build_images.outputs.tags }}" | tail -1)"
+            TAG="$(echo "${{ needs.images.outputs.tags }}" | tail -1)"
           fi
           TAG="$(echo "${TAG}" | rev | cut -d ':' -f 1 | rev | cut -d '-' -f 3-)"
           echo "TAG=${{ matrix.target }}${TAG:+-$TAG}" >> "$GITHUB_OUTPUT"
