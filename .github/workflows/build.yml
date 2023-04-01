@@ -130,7 +130,7 @@ jobs:
           elif [ '${{ matrix.tag }}' = 'versioned' ]; then
             TAG="$(echo "${{ needs.build_images.outputs.tags }}" | tail -1)"
           fi
-          TAG="$(echo "${TAG}" | rev | cut -d ':' -f 1 | rev | cut -d '-' -f 3-))"
+          TAG="$(echo "${TAG}" | rev | cut -d ':' -f 1 | rev | cut -d '-' -f 3-)"
           echo "TAG=${{ matrix.target }}${TAG:+-$TAG}" >> "$GITHUB_OUTPUT"
       - name: Log in to Docker Hub
         if: matrix.registry == 'docker.io'
