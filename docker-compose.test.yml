@@ -9,7 +9,7 @@ services:
     depends_on:
       distcc-tcp-server:
         condition: service_healthy
-    image: ${IMAGE}-test
+    image: ${TEST_IMAGE}
     environment:
       - DISTCC_HOSTS=distcc-tcp-server
 
@@ -22,6 +22,6 @@ services:
     depends_on:
       distcc-ssh-server:
         condition: service_healthy
-    image: ${IMAGE}-test
+    image: ${TEST_IMAGE}
     environment:
       - DISTCC_HOSTS=@distcc-ssh-server

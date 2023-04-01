@@ -9,6 +9,10 @@ on:
       - .github/workflows/dockerhub-description.yml
       - README.md
 
+env:
+  DOCKERHUB_REPOSITORY: ksmanis/gentoo-distcc
+  DOCKERHUB_USERNAME: ksmanis
+
 jobs:
   dockerhub-description:
     runs-on: ubuntu-latest
@@ -18,7 +22,7 @@ jobs:
       - name: Update Docker Hub description
         uses: peter-evans/dockerhub-description@v3
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_PASSWORD }}
-          repository: ksmanis/gentoo-distcc
+          repository: ${{ env.DOCKERHUB_REPOSITORY }}
+          username: ${{ env.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
           short-description: ${{ github.event.repository.description }}
