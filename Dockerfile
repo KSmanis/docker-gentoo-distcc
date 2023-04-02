@@ -1,5 +1,4 @@
-ARG BASE_TAG=latest
-FROM ksmanis/stage3:$BASE_TAG AS distcc-builder
+FROM ksmanis/stage3:20230327 AS distcc-builder
 RUN set -eux; \
     printf '[gentoo]\nsync-type = webrsync\n' > /etc/portage/repos.conf; \
     emerge --sync; \

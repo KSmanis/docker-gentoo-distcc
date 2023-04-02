@@ -2,8 +2,6 @@
 name: build
 
 on:
-  schedule:
-    - cron: '0 2 * * 1'
   push:
   pull_request:
   workflow_dispatch:
@@ -54,12 +52,12 @@ jobs:
             org.opencontainers.image.title=gentoo-distcc
             org.opencontainers.image.authors=Konstantinos Smanis <konstantinos.smanis@gmail.com>
           tags: |
-            type=schedule,pattern=${{ steps.prep.outputs.TAG }},suffix=-{{date 'YYYYMMDD'}}
-            type=schedule,pattern=${{ steps.prep.outputs.TAG }}
             type=ref,event=branch,prefix=${{ steps.prep.outputs.TAG }}-,suffix=-{{sha}}
             type=ref,event=branch,prefix=${{ steps.prep.outputs.TAG }}-
             type=ref,event=pr,prefix=${{ steps.prep.outputs.TAG }}-pr-,suffix=-{{sha}}
             type=ref,event=pr,prefix=${{ steps.prep.outputs.TAG }}-pr-
+            type=raw,value=${{ steps.prep.outputs.TAG }}-{{tag}},enable=${{ startsWith(github.ref, 'refs/tags/') }}
+            type=raw,value=${{ steps.prep.outputs.TAG }},enable=${{ startsWith(github.ref, 'refs/tags/') }}
       - name: Build image
         id: build
         uses: docker/build-push-action@v4
