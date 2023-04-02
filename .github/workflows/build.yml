@@ -54,12 +54,12 @@ jobs:
             org.opencontainers.image.title=gentoo-distcc
             org.opencontainers.image.authors=Konstantinos Smanis <konstantinos.smanis@gmail.com>
           tags: |
-            type=schedule,pattern=${{ steps.prep.outputs.TAG }}
             type=schedule,pattern=${{ steps.prep.outputs.TAG }},suffix=-{{date 'YYYYMMDD'}}
-            type=ref,event=branch,prefix=${{ steps.prep.outputs.TAG }}-
+            type=schedule,pattern=${{ steps.prep.outputs.TAG }}
             type=ref,event=branch,prefix=${{ steps.prep.outputs.TAG }}-,suffix=-{{sha}}
-            type=ref,event=pr,prefix=${{ steps.prep.outputs.TAG }}-pr-
+            type=ref,event=branch,prefix=${{ steps.prep.outputs.TAG }}-
             type=ref,event=pr,prefix=${{ steps.prep.outputs.TAG }}-pr-,suffix=-{{sha}}
+            type=ref,event=pr,prefix=${{ steps.prep.outputs.TAG }}-pr-
       - name: Build image
         id: build
         uses: docker/build-push-action@v4
@@ -116,7 +116,7 @@ jobs:
       matrix:
         registry: ["docker.io", "ghcr.io"]
         target: ["tcp", "ssh"]
-        tag: ["latest", "versioned"]
+        tag: ["versioned", "latest"]
     name: ${{ matrix.registry }}:${{ matrix.target }}:${{ matrix.tag }} manifest
     runs-on: ubuntu-latest
     steps:
@@ -125,9 +125,9 @@ jobs:
       - name: Prepare build variables
         id: prep
         run: |
-          if [ '${{ matrix.tag }}' = 'latest' ]; then
+          if [ '${{ matrix.tag }}' = 'versioned' ]; then
             TAG="$(echo "${{ needs.images.outputs.tags }}" | head -1)"
-          elif [ '${{ matrix.tag }}' = 'versioned' ]; then
+          elif [ '${{ matrix.tag }}' = 'latest' ]; then
             TAG="$(echo "${{ needs.images.outputs.tags }}" | tail -1)"
           fi
           TAG="$(echo "${TAG}" | rev | cut -d ':' -f 1 | rev | cut -d '-' -f 3-)"
