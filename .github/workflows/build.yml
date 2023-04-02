@@ -149,3 +149,19 @@ jobs:
           TAG: ${{ steps.prep.outputs.TAG }}
         run: |
           ./build-manifest.sh
+  autotag:
+    if: github.ref == 'refs/heads/master'
+    needs: manifests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
+      - name: Tag new versions
+        uses: salsify/action-detect-and-tag-new-version@v2.0.3
+        with:
+          version-command: |
+            sed -n 's#^FROM ksmanis/stage3:\(\S\+\).*#\1#p' Dockerfile
+          tag-template: "{VERSION}"
+          tag-annotation-template: "Version {VERSION}"
