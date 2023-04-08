@@ -29,14 +29,14 @@ jobs:
         id: prep
         run: |
           {
-            echo "QEMU_PLATFORM=$(echo "${{ matrix.arch }}" | cut -d '/' -f 1)"
-            echo "TAG=$(echo "${{ matrix.arch }}" | tr -d '/')-${{ matrix.target }}"
+            echo "qemu_platform=$(echo "${{ matrix.arch }}" | cut -d '/' -f 1)"
+            echo "tag=$(echo "${{ matrix.arch }}" | tr -d '/')-${{ matrix.target }}"
           } >> "$GITHUB_OUTPUT"
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
         if: matrix.arch != '386' && matrix.arch != 'amd64'
         with:
-          platforms: ${{ steps.prep.outputs.QEMU_PLATFORM }}
+          platforms: ${{ steps.prep.outputs.qemu_platform }}
       - name: Set up buildx
         uses: docker/setup-buildx-action@v2
       - name: Define Docker metadata
@@ -52,12 +52,12 @@ jobs:
             org.opencontainers.image.title=gentoo-distcc
             org.opencontainers.image.authors=Konstantinos Smanis <konstantinos.smanis@gmail.com>
           tags: |
-            type=ref,event=branch,prefix=${{ steps.prep.outputs.TAG }}-,suffix=-{{sha}}
-            type=ref,event=branch,prefix=${{ steps.prep.outputs.TAG }}-
-            type=ref,event=pr,prefix=${{ steps.prep.outputs.TAG }}-pr-,suffix=-{{sha}}
-            type=ref,event=pr,prefix=${{ steps.prep.outputs.TAG }}-pr-
-            type=raw,value=${{ steps.prep.outputs.TAG }}-{{tag}},enable=${{ startsWith(github.ref, 'refs/tags/') }}
-            type=raw,value=${{ steps.prep.outputs.TAG }},enable=${{ startsWith(github.ref, 'refs/tags/') }}
+            type=ref,event=branch,prefix=${{ steps.prep.outputs.tag }}-,suffix=-{{sha}}
+            type=ref,event=branch,prefix=${{ steps.prep.outputs.tag }}-
+            type=ref,event=pr,prefix=${{ steps.prep.outputs.tag }}-pr-,suffix=-{{sha}}
+            type=ref,event=pr,prefix=${{ steps.prep.outputs.tag }}-pr-
+            type=raw,value=${{ steps.prep.outputs.tag }}-{{tag}},enable=${{ startsWith(github.ref, 'refs/tags/') }}
+            type=raw,value=${{ steps.prep.outputs.tag }},enable=${{ startsWith(github.ref, 'refs/tags/') }}
       - name: Build image
         id: build
         uses: docker/build-push-action@v4
@@ -122,11 +122,11 @@ jobs:
       - name: Prepare build variables
         id: prep
         run: |
-          TAG="$(echo "${{ matrix.tag }}" | rev | cut -d ':' -f 1 | rev | cut -d '-' -f 3-)"
+          tag_suffix="$(echo "${{ matrix.tag }}" | rev | cut -d ':' -f 1 | rev | cut -d '-' -f 3-)"
           {
             echo "registry=$(echo "${{ matrix.tag }}" | cut -d '/' -f 1)"
             echo "repo=$(echo "${{ matrix.tag }}" | cut -d ':' -f 1)"
-            echo "tag=${{ matrix.target }}${TAG:+-$TAG}"
+            echo "tag=${{ matrix.target }}${tag_suffix:+-$tag_suffix}"
           } >> "$GITHUB_OUTPUT"
       - name: Log in to Docker Hub
         if: steps.prep.outputs.registry == 'docker.io'
