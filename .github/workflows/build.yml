@@ -30,6 +30,7 @@ jobs:
         run: |
           {
             echo "qemu_platform=$(echo "${{ matrix.arch }}" | cut -d '/' -f 1)"
+            echo "stage3_version=$(sed -n 's#^FROM ksmanis/stage3:\(\S\+\).*#\1#p' Dockerfile)"
             echo "tag=$(echo "${{ matrix.arch }}" | tr -d '/')-${{ matrix.target }}"
           } >> "$GITHUB_OUTPUT"
       - name: Set up QEMU
@@ -56,8 +57,8 @@ jobs:
             type=ref,event=branch,prefix=${{ steps.prep.outputs.tag }}-
             type=ref,event=pr,prefix=${{ steps.prep.outputs.tag }}-pr-,suffix=-{{sha}}
             type=ref,event=pr,prefix=${{ steps.prep.outputs.tag }}-pr-
-            type=raw,value=${{ steps.prep.outputs.tag }}-{{tag}},enable=${{ startsWith(github.ref, 'refs/tags/') }}
-            type=raw,value=${{ steps.prep.outputs.tag }},enable=${{ startsWith(github.ref, 'refs/tags/') }}
+            type=raw,value=${{ steps.prep.outputs.tag }}-${{ steps.prep.outputs.stage3_version }},enable={{is_default_branch}}
+            type=raw,value=${{ steps.prep.outputs.tag }},enable={{is_default_branch}}
       - name: Build image
         id: build
         uses: docker/build-push-action@v4
@@ -147,20 +148,3 @@ jobs:
           TAG: ${{ steps.prep.outputs.tag }}
         run: |
           ./build-manifest.sh
-  autotag:
-    if: github.ref == 'refs/heads/master'
-    needs: manifests
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out code
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 2
-          ssh-key: ${{ secrets.TAG_KEY }}
-      - name: Tag new versions
-        uses: salsify/action-detect-and-tag-new-version@v2.0.3
-        with:
-          version-command: |
-            sed -n 's#^FROM ksmanis/stage3:\(\S\+\).*#\1#p' Dockerfile
-          tag-template: "{VERSION}"
-          tag-annotation-template: "Version {VERSION}"
