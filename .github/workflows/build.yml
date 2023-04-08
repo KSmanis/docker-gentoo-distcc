@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     continue-on-error: true
     outputs:
-      json: ${{ steps.docker-metadata.outputs.json }}
+      manifests: ${{ steps.output.outputs.manifests }}
     steps:
       - name: Check out code
         uses: actions/checkout@v3
@@ -108,35 +108,29 @@ jobs:
         run: |
           docker push --all-tags "docker.io/${DOCKERHUB_REPOSITORY}"
           docker push --all-tags "ghcr.io/${DOCKERHUB_REPOSITORY}"
+      - name: Prepare outputs
+        id: output
+        run: |
+          echo "manifests=$(echo "${DOCKER_METADATA_OUTPUT_JSON}" | jq -cf manifests.jq)" >> "$GITHUB_OUTPUT"
   manifests:
     needs: images
     strategy:
       fail-fast: false
       matrix:
-        target: ["tcp", "ssh"]
-        tag: ${{ fromJson(needs.images.outputs.json).tags }}
-    name: ${{ matrix.target }}:${{ matrix.tag }} manifest
+        manifest: ${{ fromJson(needs.images.outputs.manifests) }}
+    name: ${{ matrix.manifest.registry }}:${{ matrix.manifest.tag }} manifest
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
         uses: actions/checkout@v3
-      - name: Prepare build variables
-        id: prep
-        run: |
-          tag_suffix="$(echo "${{ matrix.tag }}" | rev | cut -d ':' -f 1 | rev | cut -d '-' -f 3-)"
-          {
-            echo "registry=$(echo "${{ matrix.tag }}" | cut -d '/' -f 1)"
-            echo "repo=$(echo "${{ matrix.tag }}" | cut -d ':' -f 1)"
-            echo "tag=${{ matrix.target }}${tag_suffix:+-$tag_suffix}"
-          } >> "$GITHUB_OUTPUT"
       - name: Log in to Docker Hub
-        if: steps.prep.outputs.registry == 'docker.io'
+        if: matrix.manifest.registry == 'docker.io'
         uses: docker/login-action@v2
         with:
           username: ${{ env.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Log in to GitHub Container registry
-        if: steps.prep.outputs.registry == 'ghcr.io'
+        if: matrix.manifest.registry == 'ghcr.io'
         uses: docker/login-action@v2
         with:
           registry: ghcr.io
@@ -144,7 +138,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build and push manifest list
         env:
-          REPO: ${{ steps.prep.outputs.repo }}
-          TAG: ${{ steps.prep.outputs.tag }}
+          REPO: ${{ matrix.manifest.repo }}
+          TAG: ${{ matrix.manifest.tag }}
         run: |
           ./build-manifest.sh
