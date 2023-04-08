@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     continue-on-error: true
     outputs:
-      tags: ${{ steps.docker-metadata.outputs.tags }}
+      json: ${{ steps.docker-metadata.outputs.json }}
     steps:
       - name: Check out code
         uses: actions/checkout@v3
@@ -44,7 +44,7 @@ jobs:
         uses: docker/metadata-action@v4
         with:
           images: |
-            ${{ env.DOCKERHUB_REPOSITORY }}
+            docker.io/${{ env.DOCKERHUB_REPOSITORY }}
             ghcr.io/${{ env.DOCKERHUB_REPOSITORY }}
           flavor: |
             latest=false
@@ -105,17 +105,16 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Push image
         run: |
-          docker push --all-tags "${DOCKERHUB_REPOSITORY}"
+          docker push --all-tags "docker.io/${DOCKERHUB_REPOSITORY}"
           docker push --all-tags "ghcr.io/${DOCKERHUB_REPOSITORY}"
   manifests:
     needs: images
     strategy:
       fail-fast: false
       matrix:
-        registry: ["docker.io", "ghcr.io"]
         target: ["tcp", "ssh"]
-        tag: ["versioned", "latest"]
-    name: ${{ matrix.registry }}:${{ matrix.target }}:${{ matrix.tag }} manifest
+        tag: ${{ fromJson(needs.images.outputs.json).tags }}
+    name: ${{ matrix.target }}:${{ matrix.tag }} manifest
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
@@ -123,21 +122,20 @@ jobs:
       - name: Prepare build variables
         id: prep
         run: |
-          if [ '${{ matrix.tag }}' = 'versioned' ]; then
-            TAG="$(echo "${{ needs.images.outputs.tags }}" | head -1)"
-          elif [ '${{ matrix.tag }}' = 'latest' ]; then
-            TAG="$(echo "${{ needs.images.outputs.tags }}" | tail -1)"
-          fi
-          TAG="$(echo "${TAG}" | rev | cut -d ':' -f 1 | rev | cut -d '-' -f 3-)"
-          echo "TAG=${{ matrix.target }}${TAG:+-$TAG}" >> "$GITHUB_OUTPUT"
+          TAG="$(echo "${{ matrix.tag }}" | rev | cut -d ':' -f 1 | rev | cut -d '-' -f 3-)"
+          {
+            echo "registry=$(echo "${{ matrix.tag }}" | cut -d '/' -f 1)"
+            echo "repo=$(echo "${{ matrix.tag }}" | cut -d ':' -f 1)"
+            echo "tag=${{ matrix.target }}${TAG:+-$TAG}"
+          } >> "$GITHUB_OUTPUT"
       - name: Log in to Docker Hub
-        if: matrix.registry == 'docker.io'
+        if: steps.prep.outputs.registry == 'docker.io'
         uses: docker/login-action@v2
         with:
           username: ${{ env.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Log in to GitHub Container registry
-        if: matrix.registry == 'ghcr.io'
+        if: steps.prep.outputs.registry == 'ghcr.io'
         uses: docker/login-action@v2
         with:
           registry: ghcr.io
@@ -145,8 +143,8 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build and push manifest list
         env:
-          REPO: ${{ matrix.registry }}/${{ env.DOCKERHUB_REPOSITORY }}
-          TAG: ${{ steps.prep.outputs.TAG }}
+          REPO: ${{ steps.prep.outputs.repo }}
+          TAG: ${{ steps.prep.outputs.tag }}
         run: |
           ./build-manifest.sh
   autotag:
