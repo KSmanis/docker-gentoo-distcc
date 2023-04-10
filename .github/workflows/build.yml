@@ -82,10 +82,11 @@ jobs:
           load: true
       - name: Test distcc
         env:
+          DOCKER_DEFAULT_PLATFORM: linux/${{ matrix.arch }}
           IMAGE: ${{ steps.build.outputs.imageid }}
           TEST_IMAGE: ${{ steps.build-test.outputs.imageid }}
         run: |
-          docker compose -f docker-compose.test.yml up \
+          docker compose -f docker-compose.test.yml -p test up \
             --exit-code-from distcc-${{ matrix.target }}-client \
             distcc-${{ matrix.target }}-client distcc-${{ matrix.target }}-server
       - name: Log in to Docker Hub
