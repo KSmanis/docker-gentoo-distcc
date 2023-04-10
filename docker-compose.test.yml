@@ -4,6 +4,8 @@ version: "3"
 services:
   distcc-tcp-server:
     image: ${IMAGE}
+    healthcheck:
+      interval: 3s
     command: ["--enable-tcp-insecure", "--verbose"]
   distcc-tcp-client:
     depends_on:
@@ -15,6 +17,8 @@ services:
 
   distcc-ssh-server:
     image: ${IMAGE}
+    healthcheck:
+      interval: 3s
     environment:
       - AUTHORIZED_KEYS
       - SSHD_LOG_LEVEL=VERBOSE
