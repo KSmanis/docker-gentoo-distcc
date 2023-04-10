@@ -52,8 +52,8 @@ ARG TEST_USERNAME=notroot
 RUN useradd ${TEST_USERNAME}
 WORKDIR /home/${TEST_USERNAME}/
 USER ${TEST_USERNAME}
-COPY --chown=${TEST_USERNAME}:${TEST_USERNAME} tests/test.c ./
-COPY --chown=${TEST_USERNAME}:${TEST_USERNAME} tests/test.sh ./
+COPY --chown=${TEST_USERNAME} tests/test.c ./
+COPY --chown=${TEST_USERNAME} tests/test.sh ./
 ENV DISTCC_BACKOFF_PERIOD=0
 ENV DISTCC_FALLBACK=0
 ENV DISTCC_VERBOSE=1
@@ -61,6 +61,5 @@ CMD ["./test.sh"]
 
 FROM distcc-tcp-test AS distcc-ssh-test
 ARG TEST_USERNAME=notroot
-RUN ssh-keygen -t ed25519 -N '' -f ~/.ssh/id_ed25519
-COPY --chown=${TEST_USERNAME}:${TEST_USERNAME} tests/ssh_config .ssh/config
-RUN chmod 600 .ssh/config
+COPY --chown=${TEST_USERNAME} --chmod=600 tests/ssh_config .ssh/config
+COPY --chown=${TEST_USERNAME} --chmod=600 tests/ssh_ed25519_key .ssh/id_ed25519

@@ -85,12 +85,7 @@ jobs:
           IMAGE: ${{ steps.build.outputs.imageid }}
           TEST_IMAGE: ${{ steps.build-test.outputs.imageid }}
         run: |
-          if [ '${{ matrix.target }}' = 'ssh' ]; then
-            AUTHORIZED_KEYS="$(docker run --rm "${TEST_IMAGE}" cat .ssh/id_ed25519.pub)"
-            export AUTHORIZED_KEYS
-          fi
-          docker-compose -f docker-compose.test.yml up \
-            --abort-on-container-exit \
+          docker compose -f docker-compose.test.yml up \
             --exit-code-from distcc-${{ matrix.target }}-client \
             distcc-${{ matrix.target }}-client distcc-${{ matrix.target }}-server
       - name: Log in to Docker Hub

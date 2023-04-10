@@ -20,7 +20,7 @@ services:
     healthcheck:
       interval: 3s
     environment:
-      - AUTHORIZED_KEYS
+      - AUTHORIZED_KEYS=ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFuOktazZyfqDz524GM3D6iCiIcJm3CJvashP+BlNuKV
       - SSHD_LOG_LEVEL=VERBOSE
   distcc-ssh-client:
     depends_on:
