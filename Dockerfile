@@ -1,4 +1,4 @@
-FROM ksmanis/stage3:20230626@sha256:9a4de5e4f5531de0ff5cc0683dfd150f72449481108e3405b7e2842af0bbe381 AS distcc-builder
+FROM ksmanis/stage3:20230703@sha256:9956d7b9b9d98d3237be23800c02687c612a7b3689cad1f4a99a909acfc8f44f AS distcc-builder
 RUN set -eux; \
     printf '[gentoo]\nsync-type = webrsync\n' > /etc/portage/repos.conf; \
     emerge --sync; \
