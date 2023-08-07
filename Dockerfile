@@ -1,10 +1,10 @@
 FROM ksmanis/stage3:20230807@sha256:9b65a62d87c5a5d2074b5efb2baa3907337e3e4d39a6771cfa3963257055a45e AS distcc-builder
-RUN set -eux; \
-    printf '[gentoo]\nsync-type = webrsync\n' > /etc/portage/repos.conf; \
+RUN --mount=type=bind,from=ksmanis/portage,source=/var/db/repos/gentoo,target=/var/db/repos/gentoo,rw \
+    set -eux; \
     emerge --sync; \
     emerge --info; \
     emerge --quiet-build -tv distcc; \
-    rm -rf /var/cache/distfiles/ /var/db/repos/gentoo/; \
+    rm -rf /var/cache/distfiles/; \
     distcc --version
 
 FROM distcc-builder AS distcc-tcp
