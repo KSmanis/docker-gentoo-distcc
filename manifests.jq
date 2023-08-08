@@ -6,7 +6,7 @@
   }
 ) | map(
   [
-    .,
-    .tag |= (split("-") | .[0] = (if .[0] == "tcp" then "ssh" elif .[0] == "ssh" then "tcp" else .[0] end) | join("-"))
+    .tag |= (split("-") | .[0] = "tcp" | join("-")),
+    .tag |= (split("-") | .[0] = "ssh" | join("-"))
   ]
 ) | flatten
