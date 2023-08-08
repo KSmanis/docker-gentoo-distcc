@@ -2,7 +2,7 @@
 FROM ksmanis/stage3:20230807@sha256:9b65a62d87c5a5d2074b5efb2baa3907337e3e4d39a6771cfa3963257055a45e AS distcc-builder
 RUN --mount=type=bind,from=ksmanis/gentoo-distcc:tcp,source=/var/cache/binpkgs,target=/cache \
     set -eux; \
-    cp -a /cache/. /var/cache/binpkgs; \
+    cp -av /cache/. /var/cache/binpkgs; \
     export EMERGE_DEFAULT_OPTS="--buildpkg --color=y --quiet-build --tree --usepkg --verbose"; \
     emerge-webrsync; \
     emerge --info; \
