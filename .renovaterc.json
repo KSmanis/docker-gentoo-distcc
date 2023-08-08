@@ -3,5 +3,16 @@
   "extends": [
     "KSmanis/renovate-config"
   ],
+  "packageRules": [
+    {
+      "matchDatasources": [
+        "docker"
+      ],
+      "matchPackageNames": [
+        "ksmanis/gentoo-distcc"
+      ],
+      "pinDigests": false
+    }
+  ],
   "semanticCommits": "enabled"
 }
