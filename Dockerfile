@@ -1,15 +1,16 @@
 FROM ksmanis/stage3:20230807@sha256:9b65a62d87c5a5d2074b5efb2baa3907337e3e4d39a6771cfa3963257055a45e AS distcc-builder
 COPY --from=ksmanis/gentoo-distcc:tcp /var/cache/binpkgs /var/cache/binpkgs
 RUN set -eux; \
+    export EMERGE_DEFAULT_OPTS="--buildpkg --quiet-build --tree --usepkg --verbose"; \
     emerge-webrsync; \
     emerge --info; \
-    emerge --quiet-build -bktv distcc gentoolkit; \
+    emerge distcc; \
     distcc --version; \
-    rm -rf /var/db/repos/gentoo/; \
-    find /var/cache/distfiles/ -mindepth 1 -delete -print; \
+    emerge --oneshot gentoolkit; \
     eclean packages; \
-    emerge --deselect gentoolkit; \
-    CLEAN_DELAY=0 emerge --depclean gentoolkit
+    CLEAN_DELAY=0 emerge --depclean gentoolkit; \
+    find /var/cache/distfiles/ -mindepth 1 -delete -print; \
+    rm -rf /var/db/repos/gentoo/
 
 FROM distcc-builder AS distcc-tcp
 ARG TARGETPLATFORM
