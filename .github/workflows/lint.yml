@@ -14,7 +14,7 @@ jobs:
       - name: Install pre-commit
         run: pipx install pre-commit
       - name: Identify Python version
-        run: echo "PYTHON_VERSION=$(python -V | cut -d' ' -f2 | cut -d. -f-2)" >> "$GITHUB_ENV"
+        run: echo "PYTHON_VERSION=$(python -V | cut -d' ' -f2)" >> "$GITHUB_ENV"
       - name: Cache pre-commit hooks
         id: cache-pre-commit
         uses: actions/cache@v3
