@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.2
-FROM ksmanis/stage3:20230828@sha256:1f3b84a5e8a67473e0b98612881c9a31404ecb43fa2da3eed9ea971a92a8d3e4 AS distcc-builder
+FROM ksmanis/stage3:20230904@sha256:66b08e0da9ac50c46b2fde22eb8f89ebec8d7868bba28d7bf4427570447d518d AS distcc-builder
 RUN --mount=type=bind,from=ksmanis/gentoo-distcc:tcp,source=/var/cache/binpkgs,target=/cache \
     set -eux; \
     cp -av /cache/. /var/cache/binpkgs; \
