@@ -12,6 +12,15 @@
         "ksmanis/gentoo-distcc"
       ],
       "pinDigests": false
+    },
+    {
+      "automerge": true,
+      "matchDatasources": [
+        "docker"
+      ],
+      "matchPackageNames": [
+        "ksmanis/stage3"
+      ]
     }
   ],
   "semanticCommits": "enabled"
