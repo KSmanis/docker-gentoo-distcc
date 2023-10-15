@@ -1,10 +1,10 @@
 # syntax=docker/dockerfile:1.2
 FROM ksmanis/stage3:20231009@sha256:dfacaaba621b54aa887dc6d08f50157c3d61896423d69d4b07c60d77c2d74b25 AS distcc-builder
 RUN --mount=type=bind,from=ksmanis/gentoo-distcc:tcp,source=/var/cache/binpkgs,target=/cache \
+    --mount=type=bind,from=ksmanis/portage,source=/var/db/repos/gentoo,target=/var/db/repos/gentoo \
     set -eux; \
     cp -av /cache/. /var/cache/binpkgs; \
     export EMERGE_DEFAULT_OPTS="--buildpkg --color=y --quiet-build --tree --usepkg --verbose"; \
-    emerge-webrsync; \
     emerge --info; \
     emerge distcc; \
     distcc --version; \

@@ -9,7 +9,8 @@
         "docker"
       ],
       "matchPackageNames": [
-        "ksmanis/gentoo-distcc"
+        "ksmanis/gentoo-distcc",
+        "ksmanis/portage"
       ],
       "pinDigests": false
     },
