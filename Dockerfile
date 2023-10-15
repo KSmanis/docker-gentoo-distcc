@@ -11,8 +11,7 @@ RUN --mount=type=bind,from=ksmanis/gentoo-distcc:tcp,source=/var/cache/binpkgs,t
     emerge --oneshot gentoolkit; \
     eclean packages; \
     CLEAN_DELAY=0 emerge --depclean gentoolkit; \
-    find /var/cache/distfiles/ -mindepth 1 -delete -print; \
-    rm -rf /var/db/repos/gentoo/
+    find /var/cache/distfiles/ -mindepth 1 -delete -print
 
 FROM distcc-builder AS distcc-tcp
 ARG TARGETPLATFORM
