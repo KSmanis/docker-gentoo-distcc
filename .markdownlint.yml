@@ -1,5 +1,5 @@
 ---
 line_length:
   code_blocks: false
-no-duplicate-header:
+no-duplicate-heading:
   allow_different_nesting: true
