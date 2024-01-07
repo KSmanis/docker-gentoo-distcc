@@ -37,10 +37,6 @@ repos:
       - id: pretty-format-json
         args: ["--autofix"]
   # Markdown
-  - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.38.0
-    hooks:
-      - id: markdownlint
   - repo: https://github.com/executablebooks/mdformat
     rev: 0.7.17
     hooks:
@@ -49,6 +45,10 @@ repos:
           - mdformat-gfm
           - mdformat-tables
         args: ["--number", "--wrap", "80"]
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.38.0
+    hooks:
+      - id: markdownlint
   # Shell
   - repo: https://github.com/shellcheck-py/shellcheck-py
     rev: v0.9.0.6
