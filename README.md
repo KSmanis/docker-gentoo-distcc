@@ -7,7 +7,8 @@
 [![Renovate enabled](https://img.shields.io/badge/renovate-enabled-brightgreen.svg?logo=renovatebot&logoColor=white)](https://renovatebot.com/)
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
 
-Gentoo Docker image with distcc that can be used to speed up compilation jobs
+Decrease Gentoo compilation times by leveraging spare resources, such as an
+Ubuntu or Windows box idling around. Docker is the only prerequisite.
 
 ## Features
 
@@ -20,6 +21,8 @@ Gentoo Docker image with distcc that can be used to speed up compilation jobs
   - `arm64`
   - `ppc64`
   - `x86`
+
+*Note*: Only the stable toolchain of these architectures is currently supported.
 
 ## Usage
 
