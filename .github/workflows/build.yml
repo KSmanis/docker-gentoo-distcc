@@ -61,7 +61,7 @@ jobs:
             type=raw,value=${{ steps.prep.outputs.tag }},enable={{is_default_branch}}
       - name: Build image
         id: build
-        uses: docker/build-push-action@af5a7ed5ba88268d5278f7203fb52cd833f66d6e # v5
+        uses: docker/build-push-action@2cdde995de11925a030ce8070c3d77a52ffcf1c0 # v5
         with:
           context: .
           labels: ${{ steps.docker-metadata.outputs.labels }}
@@ -74,7 +74,7 @@ jobs:
           docker image inspect ${{ steps.build.outputs.imageid }}
       - name: Build test image
         id: build-test
-        uses: docker/build-push-action@af5a7ed5ba88268d5278f7203fb52cd833f66d6e # v5
+        uses: docker/build-push-action@2cdde995de11925a030ce8070c3d77a52ffcf1c0 # v5
         with:
           context: .
           platforms: linux/${{ matrix.arch }}
