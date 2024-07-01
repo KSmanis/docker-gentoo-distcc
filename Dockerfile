@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.8.1@sha256:e87caa74dcb7d46cd820352bfea12591f3dba3ddc4285e19c7dcd13359f7cefd
-FROM ksmanis/stage3:20240624@sha256:cc4007cdb1ecaf17cd64bc98e36e1e9fcab4cf96e396f3198c293a7686f2b528 AS distcc-builder
+FROM ksmanis/stage3:20240701@sha256:c821cb2af28ff3770df2022941a8fbed9a2ae51627293e7d0522b77d79a17547 AS distcc-builder
 RUN --mount=type=bind,from=ksmanis/gentoo-distcc:tcp,source=/var/cache/binpkgs,target=/cache \
     --mount=type=bind,from=ksmanis/portage,source=/var/db/repos/gentoo,target=/var/db/repos/gentoo \
     set -eux; \
