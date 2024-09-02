@@ -26,6 +26,10 @@ if [ "$1" = "sshd" ]; then
     fi
     # Execute sshd using absolute path
     shift
+    if [ "${DISTCC_CCACHE_ENABLE}" = 1 ]; then
+        echo "PATH=/usr/lib/ccache/bin" >> /etc/env.d/02distcc-ssh-ccache
+        env-update
+    fi
     exec /usr/sbin/sshd "$@"
 fi
 

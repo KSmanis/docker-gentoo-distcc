@@ -1,5 +1,7 @@
 # syntax=docker/dockerfile:1.10.0@sha256:865e5dd094beca432e8c0a1d5e1c465db5f998dca4e439981029b3b81fb39ed5
 FROM ksmanis/stage3:20240930@sha256:8e8a7c86ab167ea0b740664492e78dc97c33cc59f6fff13bf4ac40bca7804a37 AS distcc-builder
+ARG CCACHE_DIR=/var/cache/ccache
+ENV CCACHE_DIR=$CCACHE_DIR
 RUN --mount=type=bind,from=ksmanis/gentoo-distcc:tcp,source=/var/cache/binpkgs,target=/cache \
     --mount=type=bind,from=ksmanis/portage,source=/var/db/repos/gentoo,target=/var/db/repos/gentoo \
     set -eux; \
@@ -8,10 +10,18 @@ RUN --mount=type=bind,from=ksmanis/gentoo-distcc:tcp,source=/var/cache/binpkgs,t
     emerge --info; \
     emerge distcc; \
     distcc --version; \
+    emerge ccache; \
+    ccache --version; \
+    echo "CCACHE_DIR=${CCACHE_DIR}" > /etc/env.d/02distcc-ssh-ccache; \
+    env-update; \
+    mkdir "${CCACHE_DIR}"; \
+    chmod 0775 "${CCACHE_DIR}"; \
+    chown distcc:distcc "${CCACHE_DIR}"; \
     emerge --oneshot gentoolkit; \
     eclean packages; \
     CLEAN_DELAY=0 emerge --depclean gentoolkit; \
     find /var/cache/distfiles/ -mindepth 1 -delete -print
+VOLUME $CCACHE_DIR
 
 FROM distcc-builder AS distcc-tcp
 ARG TARGETPLATFORM
