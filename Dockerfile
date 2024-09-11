@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1.9.0@sha256:fe40cf4e92cd0c467be2cfc30657a680ae2398318afd50b0c80585784c604f28
+# syntax=docker/dockerfile:1.10.0@sha256:865e5dd094beca432e8c0a1d5e1c465db5f998dca4e439981029b3b81fb39ed5
 FROM ksmanis/stage3:20240909@sha256:6dd9c18caac2c6990f4240da315921c7d4398ab008b096bb92f16c4d8e2a65dd AS distcc-builder
 RUN --mount=type=bind,from=ksmanis/gentoo-distcc:tcp,source=/var/cache/binpkgs,target=/cache \
     --mount=type=bind,from=ksmanis/portage,source=/var/db/repos/gentoo,target=/var/db/repos/gentoo \
