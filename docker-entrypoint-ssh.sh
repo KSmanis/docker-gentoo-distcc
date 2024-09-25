@@ -11,12 +11,12 @@ fi
 
 if [ "$1" = "sshd" ]; then
     # Create user and set up SSH access
-    id "${SSH_USERNAME}" >/dev/null 2>&1 || useradd "${SSH_USERNAME}"
+    id "${SSH_USERNAME}" >/dev/null 2>&1 || useradd -g distcc "${SSH_USERNAME}"
     mkdir -p "/home/${SSH_USERNAME}/.ssh"
-    chown "${SSH_USERNAME}:${SSH_USERNAME}" "/home/${SSH_USERNAME}/.ssh"
+    chown "${SSH_USERNAME}:distcc" "/home/${SSH_USERNAME}/.ssh"
     chmod 700 "/home/${SSH_USERNAME}/.ssh"
     echo "${AUTHORIZED_KEYS}" > "/home/${SSH_USERNAME}/.ssh/authorized_keys"
-    chown "${SSH_USERNAME}:${SSH_USERNAME}" "/home/${SSH_USERNAME}/.ssh/authorized_keys"
+    chown "${SSH_USERNAME}:distcc" "/home/${SSH_USERNAME}/.ssh/authorized_keys"
     chmod 600 "/home/${SSH_USERNAME}/.ssh/authorized_keys"
     # Create missing SSH host keys
     ssh-keygen -A
