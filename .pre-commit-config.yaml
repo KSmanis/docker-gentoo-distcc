@@ -33,9 +33,9 @@ repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.6.0
     hooks:
-      - id: check-json
       - id: pretty-format-json
         args: ["--autofix"]
+      - id: check-json
   # Markdown
   - repo: https://github.com/executablebooks/mdformat
     rev: 0.7.17
