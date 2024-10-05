@@ -105,6 +105,63 @@ through the optional `SSH_USERNAME` environment variable:
 docker run -d -p 30022:22 -e SSH_USERNAME=bob -e AUTHORIZED_KEYS="..." --name gentoo-distcc-ssh --rm ksmanis/gentoo-distcc:ssh
 ```
 
+### Persistent [ccache(1)](https://ccache.dev/manual/latest.html)
+
+Ccache speeds up recompilation by caching the result of previous compilations
+and detecting when the same compilation is being done again. That can help save
+time on compilation if you end up recompiling for any reason i.e. because you
+have multiple gentoo machines which have an overlapping package selection.
+
+Check the [gentoo wiki](https://wiki.gentoo.org/wiki/Ccache) to learn more. If
+you only have one gentoo machine and it has enough disk space to host its own
+cache, you might be better off with one local ccache on that machine with
+`FEATURES="ccache"`. If you want to also add a cache to the container, keep
+reading.
+
+To enable the use of `ccache` you have to set `DISTCC_CCACHE_ENABLE` to `1`. And
+to further make it persist over multiple container runs you need to mount a
+container volume or a host directory to `/var/cache/ccache`.
+
+#### Example with a persistent ccache in a docker volume
+
+Create a new volume for persistency:
+
+```shell
+docker volume create gentoo-distcc-ccache
+```
+
+```shell
+docker run -d -p 3632:3632 --name gentoo-distcc-tcp --rm -v gentoo-distcc-ccache:/var/cache/ccache/:rw -e DISTCC_CCACHE_ENABLE=1 ksmanis/gentoo-distcc:tcp
+```
+
+For the ssh variant of the container images it works exactly the same way.
+
+#### Notes on ccache
+
+To check the status of the cache you can run `ccache -s` with the container
+image like that:
+
+```shell
+docker run -t -i --rm -v gentoo-distcc-ccache:/var/cache/ccache/:rw ksmanis/gentoo-distcc:tcp watch -d ccache -s
+```
+
+In case you created a container with the ssh variant, you can also ssh into it
+and run `ccache -s`.
+
+```shell
+ssh localhost-distcc ccache -s
+```
+
+You should see the cache filling up and if you compile the same package twice
+you should see cache hits coming in. If you are using `FEATURES="ccache"` from
+gentoo you might want to disable it for a test. Otherwise local cache hits will
+prevent remote compilation.
+
+When you choose a bind-mount the cache is a shared folder between the host and
+the container. If both want to access it you might have to play with `chown` and
+`CCACHE_UMASK` (or `umask` in ccache.conf). Note that a world writable cache
+will have security implications on all systems using distcc.
+
 ## Testing
 
 A manual way to test the containers is to compile a sample C file:
