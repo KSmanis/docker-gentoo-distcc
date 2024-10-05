@@ -1,7 +1,8 @@
 ---
 services:
   distcc-tcp-server:
-    image: ${IMAGE}
+    build:
+      target: distcc-tcp
     healthcheck:
       interval: 3s
       start_period: 30s
@@ -10,12 +11,14 @@ services:
     depends_on:
       distcc-tcp-server:
         condition: service_healthy
-    image: ${TEST_IMAGE}
+    build:
+      target: distcc-tcp-test
     environment:
       - DISTCC_HOSTS=distcc-tcp-server
 
   distcc-ssh-server:
-    image: ${IMAGE}
+    build:
+      target: distcc-ssh
     healthcheck:
       interval: 3s
       start_period: 30s
@@ -26,6 +29,7 @@ services:
     depends_on:
       distcc-ssh-server:
         condition: service_healthy
-    image: ${TEST_IMAGE}
+    build:
+      target: distcc-ssh-test
     environment:
       - DISTCC_HOSTS=@distcc-ssh-server
