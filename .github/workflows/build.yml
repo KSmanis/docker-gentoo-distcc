@@ -24,7 +24,7 @@ jobs:
       manifests: ${{ steps.output.outputs.manifests }}
     steps:
       - name: Check out code
-        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
+        uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871 # v4
       - name: Prepare build variables
         id: prep
         run: |
@@ -108,7 +108,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
-        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
+        uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871 # v4
       - name: Log in to Docker Hub
         if: matrix.manifest.registry == 'docker.io'
         uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 # v3
