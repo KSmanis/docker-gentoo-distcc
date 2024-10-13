@@ -16,8 +16,10 @@ RUN --mount=type=bind,from=ksmanis/gentoo-distcc:tcp,source=/var/cache/binpkgs,t
     find /var/cache/distfiles/ -mindepth 1 -delete -print
 
 FROM distcc AS distcc-ccache
-RUN --mount=type=bind,from=ksmanis/portage,source=/var/db/repos/gentoo,target=/var/db/repos/gentoo \
+RUN --mount=type=bind,from=ksmanis/gentoo-distcc:tcp-ccache,source=/var/cache/binpkgs,target=/cache \
+    --mount=type=bind,from=ksmanis/portage,source=/var/db/repos/gentoo,target=/var/db/repos/gentoo \
     set -eux; \
+    cp -av /cache/. /var/cache/binpkgs; \
     export EMERGE_DEFAULT_OPTS="--buildpkg --color=y --quiet-build --tree --usepkg --verbose"; \
     emerge --info; \
     emerge ccache; \
