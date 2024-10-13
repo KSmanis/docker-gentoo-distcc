@@ -105,6 +105,33 @@ through the optional `SSH_USERNAME` environment variable:
 docker run -d -p 30022:22 -e SSH_USERNAME=bob -e AUTHORIZED_KEYS="..." --name gentoo-distcc-ssh --rm ksmanis/gentoo-distcc:ssh
 ```
 
+### Ccache
+
+If you share a worker instance between multiple clients, you might be interested
+in enabling server-side caching with `ccache` to avoid redundant recompilations.
+To do so, pull the `ccache` image variants, i.e., `tcp-ccache` instead of `tcp`,
+and `ssh-ccache` instead of `ssh`:
+
+```shell
+# TCP
+docker run -d -p 3632:3632 --name gentoo-distcc-tcp-ccache --rm ksmanis/gentoo-distcc:tcp-ccache
+# SSH
+docker run -d -p 30022:22 -e AUTHORIZED_KEYS="..." --name gentoo-distcc-ssh-ccache --rm ksmanis/gentoo-distcc:ssh-ccache
+```
+
+The directory `/var/cache/ccache` automatically persists in an anonymous Docker
+volume, but a named Docker volume or a bind mount may also be used for stronger
+persistence guarantees.
+
+Ccache statistics can be queried as follows:
+
+```shell
+# TCP
+docker exec gentoo-distcc-tcp-ccache ccache -sv
+# SSH
+docker exec gentoo-distcc-ssh-ccache ccache -sv
+```
+
 ## Testing
 
 A manual way to test the containers is to compile a sample C file:

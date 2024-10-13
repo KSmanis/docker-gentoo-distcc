@@ -1,5 +1,7 @@
 # syntax=docker/dockerfile:1.10.0@sha256:865e5dd094beca432e8c0a1d5e1c465db5f998dca4e439981029b3b81fb39ed5
-FROM ksmanis/stage3:20241007@sha256:4d9d46e4de6279d92ed31bedc21f49013731a694211061a69aae8a0da6033612 AS distcc-builder
+ARG BASE=distcc
+
+FROM ksmanis/stage3:20241007@sha256:4d9d46e4de6279d92ed31bedc21f49013731a694211061a69aae8a0da6033612 AS distcc
 RUN --mount=type=bind,from=ksmanis/gentoo-distcc:tcp,source=/var/cache/binpkgs,target=/cache \
     --mount=type=bind,from=ksmanis/portage,source=/var/db/repos/gentoo,target=/var/db/repos/gentoo \
     set -eux; \
@@ -13,7 +15,30 @@ RUN --mount=type=bind,from=ksmanis/gentoo-distcc:tcp,source=/var/cache/binpkgs,t
     CLEAN_DELAY=0 emerge --depclean gentoolkit; \
     find /var/cache/distfiles/ -mindepth 1 -delete -print
 
-FROM distcc-builder AS distcc-tcp
+FROM distcc AS distcc-ccache
+RUN --mount=type=bind,from=ksmanis/portage,source=/var/db/repos/gentoo,target=/var/db/repos/gentoo \
+    set -eux; \
+    export EMERGE_DEFAULT_OPTS="--buildpkg --color=y --quiet-build --tree --usepkg --verbose"; \
+    emerge --info; \
+    emerge ccache; \
+    ccache --version; \
+    emerge --oneshot gentoolkit; \
+    eclean packages; \
+    CLEAN_DELAY=0 emerge --depclean gentoolkit; \
+    find /var/cache/distfiles/ -mindepth 1 -delete -print
+ARG CCACHE_DIR=/var/cache/ccache
+ENV CCACHE_DIR="$CCACHE_DIR"
+ENV PATH="/usr/lib/ccache/bin${PATH:+:$PATH}"
+RUN set -eux; \
+    printf 'CCACHE_DIR="%s"\nPATH="/usr/lib/ccache/bin"\n' "$CCACHE_DIR" > /etc/env.d/02distcc-ccache; \
+    env-update; \
+    mkdir -p "${CCACHE_DIR}"; \
+    chmod 0775 "${CCACHE_DIR}"; \
+    chown distcc:distcc "${CCACHE_DIR}"
+VOLUME ["$CCACHE_DIR"]
+
+# hadolint ignore=DL3006
+FROM $BASE AS distcc-tcp
 ARG TARGETPLATFORM
 # renovate: datasource=github-tags depName=krallin/tini
 ARG TINI_VERSION=0.19.0
@@ -46,16 +71,18 @@ ENTRYPOINT ["tini", "-e", "143", "--", "docker-entrypoint.sh"]
 EXPOSE 3632
 HEALTHCHECK CMD ["lsdistcc", "-pgcc", "localhost"]
 
-FROM distcc-builder AS distcc-ssh
+# hadolint ignore=DL3006
+FROM $BASE AS distcc-ssh
 ENV SSH_USERNAME=distcc-ssh
 COPY docker-entrypoint-ssh.sh /usr/local/bin/docker-entrypoint.sh
 ENTRYPOINT ["docker-entrypoint.sh"]
 EXPOSE 22
 HEALTHCHECK CMD </dev/tcp/localhost/22 || exit 1
 
-FROM distcc-builder AS distcc-tcp-test
+# hadolint ignore=DL3006
+FROM $BASE AS distcc-tcp-test
 ARG TEST_USERNAME=notroot
-RUN useradd ${TEST_USERNAME}
+RUN useradd -G distcc ${TEST_USERNAME}
 WORKDIR /home/${TEST_USERNAME}/
 USER ${TEST_USERNAME}
 COPY --chown=${TEST_USERNAME} tests/test.c ./

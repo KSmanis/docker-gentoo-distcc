@@ -33,3 +33,58 @@ services:
       target: distcc-ssh-test
     environment:
       - DISTCC_HOSTS=@distcc-ssh-server
+
+  distcc-tcp-ccache-server:
+    build:
+      args:
+        BASE: distcc-ccache
+      target: distcc-tcp
+    healthcheck:
+      interval: 3s
+      start_period: 30s
+      test: ["CMD", "lsdistcc", "localhost"]  # Do not trigger ccache
+    command: ["--enable-tcp-insecure", "--verbose"]
+    volumes:
+      - distcc-tcp-ccache:/var/cache/ccache
+  distcc-tcp-ccache-client:
+    depends_on:
+      distcc-tcp-ccache-server:
+        condition: service_healthy
+    build:
+      args:
+        BASE: distcc-ccache
+      target: distcc-tcp-test
+    environment:
+      - DISTCC_HOSTS=distcc-tcp-ccache-server
+    volumes:
+      - distcc-tcp-ccache:/var/cache/ccache
+
+  distcc-ssh-ccache-server:
+    build:
+      args:
+        BASE: distcc-ccache
+      target: distcc-ssh
+    healthcheck:
+      interval: 3s
+      start_period: 30s
+    environment:
+      - AUTHORIZED_KEYS=ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFuOktazZyfqDz524GM3D6iCiIcJm3CJvashP+BlNuKV
+      - SSHD_LOG_LEVEL=VERBOSE
+    volumes:
+      - distcc-ssh-ccache:/var/cache/ccache
+  distcc-ssh-ccache-client:
+    depends_on:
+      distcc-ssh-ccache-server:
+        condition: service_healthy
+    build:
+      args:
+        BASE: distcc-ccache
+      target: distcc-ssh-test
+    environment:
+      - DISTCC_HOSTS=@distcc-ssh-ccache-server
+    volumes:
+      - distcc-ssh-ccache:/var/cache/ccache
+
+volumes:
+  distcc-tcp-ccache:
+  distcc-ssh-ccache:

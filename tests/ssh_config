@@ -1,4 +1,4 @@
-Host distcc-ssh-server
+Host distcc-ssh-server distcc-ssh-ccache-server
     LogLevel VERBOSE
     StrictHostKeyChecking accept-new
     User distcc-ssh
