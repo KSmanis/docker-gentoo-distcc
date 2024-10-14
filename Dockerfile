@@ -68,10 +68,11 @@ RUN set -eux; \
     chmod +x /usr/local/bin/tini; \
     tini --version
 COPY docker-entrypoint-tcp.sh /usr/local/bin/docker-entrypoint.sh
+COPY healthcheck-tcp.sh /usr/local/bin/healthcheck.sh
 # distccd exits with code 143 for SIGTERM; remap it to 0
 ENTRYPOINT ["tini", "-e", "143", "--", "docker-entrypoint.sh"]
 EXPOSE 3632
-HEALTHCHECK CMD ["lsdistcc", "-pgcc", "localhost"]
+HEALTHCHECK CMD ["healthcheck.sh"]
 
 # hadolint ignore=DL3006
 FROM $BASE AS distcc-ssh

@@ -42,7 +42,6 @@ services:
     healthcheck:
       interval: 3s
       start_period: 30s
-      test: ["CMD", "lsdistcc", "localhost"]  # Do not trigger ccache
     command: ["--enable-tcp-insecure", "--verbose"]
     volumes:
       - distcc-tcp-ccache:/var/cache/ccache
