@@ -38,7 +38,7 @@ repos:
       - id: check-json
   # Markdown
   - repo: https://github.com/executablebooks/mdformat
-    rev: 0.7.17
+    rev: 0.7.18
     hooks:
       - id: mdformat
         additional_dependencies:
