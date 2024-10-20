@@ -73,6 +73,7 @@ COPY healthcheck-tcp.sh /usr/local/bin/healthcheck.sh
 ENTRYPOINT ["tini", "-e", "143", "--", "docker-entrypoint.sh"]
 EXPOSE 3632
 HEALTHCHECK CMD ["healthcheck.sh"]
+USER distcc
 
 # hadolint ignore=DL3006
 FROM $BASE AS distcc-ssh
