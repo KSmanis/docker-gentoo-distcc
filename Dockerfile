@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1.10.0@sha256:865e5dd094beca432e8c0a1d5e1c465db5f998dca4e439981029b3b81fb39ed5
+# syntax=docker/dockerfile:1.11.0@sha256:1f2be5a2aa052cbd9aedf893d17c63277c3d1c51b3fb0f3b029c6b34f658d057
 ARG BASE=distcc
 
 FROM ksmanis/stage3:20241028@sha256:abe8042597d7eebfecbb13d9d711d04f814d2912da34717fef9a40001d404465 AS distcc
