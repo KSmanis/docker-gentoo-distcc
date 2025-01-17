@@ -18,7 +18,7 @@ jobs:
         arch: ["386", "amd64", "arm/v6", "arm/v7", "arm64", "ppc64le"]
         manifest: ["tcp", "ssh", "tcp-ccache", "ssh-ccache"]
     name: ${{ matrix.arch }}:${{ matrix.manifest }} image
-    runs-on: ubuntu-latest
+    runs-on: ${{ startsWith(matrix.arch, 'arm') && 'ubuntu-24.04-arm' || 'ubuntu-latest' }}
     continue-on-error: true
     outputs:
       manifests: ${{ steps.output.outputs.manifests }}
@@ -37,7 +37,7 @@ jobs:
           } >> "$GITHUB_OUTPUT"
       - name: Set up QEMU
         uses: docker/setup-qemu-action@53851d14592bedcffcf25ea515637cff71ef929a # v3
-        if: matrix.arch != 'amd64'
+        if: matrix.arch == '386' || matrix.arch == 'ppc64le'
         with:
           platforms: ${{ steps.prep.outputs.qemu_platform }}
       - name: Set up buildx
