@@ -16,8 +16,16 @@ jobs:
       fail-fast: false
       matrix:
         arch: ["386", "amd64", "arm/v6", "arm/v7", "arm64", "ppc64le"]
+        crossdev_target: [""]  # skip crossdev by default
         manifest: ["tcp", "ssh", "tcp-ccache", "ssh-ccache"]
-    name: ${{ matrix.arch }}:${{ matrix.manifest }} image
+        include:
+          - arch: "arm64"
+            crossdev_target: "x86_64-pc-linux-gnu"
+            manifest: "tcp"
+          - arch: "arm64"
+            crossdev_target: "x86_64-pc-linux-gnu"
+            manifest: "tcp-ccache"
+    name: ${{ matrix.arch }}:${{ matrix.crossdev_target }}:${{ matrix.manifest }} image
     runs-on: ${{ startsWith(matrix.arch, 'arm') && 'ubuntu-24.04-arm' || 'ubuntu-latest' }}
     continue-on-error: true
     outputs:
@@ -31,7 +39,7 @@ jobs:
           {
             echo "base=$(echo "${{ matrix.manifest }}" | sed 's/^\(tcp\|ssh\)/distcc/')"
             echo "stage3_version=$(sed -n 's#^FROM ksmanis/stage3:\(\S\+\).*#\1#p' Dockerfile)"
-            echo "tag=$(echo "${{ matrix.arch }}" | tr -d '/')-${{ matrix.manifest }}"
+            echo "tag=$(echo "${{ matrix.arch }}" | tr -d '/')-${{ matrix.manifest }}$(echo "${{ matrix.crossdev_target }}" | sed '/./ s/^/-/')"
             echo "target=distcc-$(echo "${{ matrix.manifest }}" | cut -d '-' -f 1)"
           } >> "$GITHUB_OUTPUT"
       - name: Set up QEMU
@@ -66,6 +74,7 @@ jobs:
         with:
           build-args: |
             BASE=${{ steps.prep.outputs.base }}
+            CROSSDEV_TARGET=${{ matrix.crossdev_target }}
           context: .
           labels: ${{ steps.docker-metadata.outputs.labels }}
           tags: ${{ steps.docker-metadata.outputs.tags }}

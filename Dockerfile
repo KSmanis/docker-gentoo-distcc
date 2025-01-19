@@ -2,6 +2,7 @@
 ARG BASE=distcc
 
 FROM ksmanis/stage3:20250113@sha256:26d5e5cfe5ac94d3ecd5dd9d2fdfd49d51bf526d056569beb361c8adb9457d8c AS distcc
+ARG CROSSDEV_TARGET=
 RUN --mount=type=bind,from=ksmanis/gentoo-distcc:tcp,source=/var/cache/binpkgs,target=/cache \
     --mount=type=bind,from=ksmanis/portage,source=/var/db/repos/gentoo,target=/var/db/repos/gentoo \
     set -eux; \
@@ -10,6 +11,18 @@ RUN --mount=type=bind,from=ksmanis/gentoo-distcc:tcp,source=/var/cache/binpkgs,t
     emerge --info; \
     emerge distcc; \
     distcc --version; \
+    if [ -n "${CROSSDEV_TARGET}" ]; then \
+        emerge crossdev; \
+        crossdev --version; \
+        mkdir -p /var/db/repos/crossdev/metadata; \
+        echo 'masters = gentoo' > /var/db/repos/crossdev/metadata/layout.conf; \
+        mkdir -p /var/db/repos/crossdev/profiles; \
+        echo 'crossdev' > /var/db/repos/crossdev/profiles/repo_name; \
+        chown -R portage:portage /var/db/repos/crossdev; \
+        mkdir -p /etc/portage/repos.conf; \
+        printf '[crossdev]\nlocation = /var/db/repos/crossdev\npriority = 10\nmasters = gentoo\nauto-sync = no\n' > /etc/portage/repos.conf/crossdev.conf; \
+        crossdev --portage '--buildpkg --usepkg' --stable --target "${CROSSDEV_TARGET}"; \
+    fi; \
     emerge --oneshot gentoolkit; \
     eclean packages; \
     CLEAN_DELAY=0 emerge --depclean gentoolkit; \
