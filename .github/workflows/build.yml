@@ -122,9 +122,15 @@ jobs:
         manifest: ${{ fromJson(needs.images.outputs.manifests) }}
     name: ${{ matrix.manifest.registry }}:${{ matrix.manifest.tag }} manifest
     runs-on: ubuntu-latest
+    env:
+      MANIFEST: ${{ matrix.manifest.repo }}:${{ matrix.manifest.tag }}
     steps:
-      - name: Check out code
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+      - name: Create manifest
+        run: |
+          for arch in 386 amd64 armv6 armv7 arm64 ppc64le; do
+            image="${{ matrix.manifest.repo }}:${arch}-${{ matrix.manifest.tag }}"
+            docker manifest create --amend "${MANIFEST}" "${image}" || true
+          done
       - name: Log in to Docker Hub
         if: matrix.manifest.registry == 'docker.io'
         uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 # v3
@@ -138,9 +144,6 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build and push manifest list
-        env:
-          REPO: ${{ matrix.manifest.repo }}
-          TAG: ${{ matrix.manifest.tag }}
+      - name: Push manifest
         run: |
-          ./build-manifest.sh
+          docker manifest push "${MANIFEST}"
