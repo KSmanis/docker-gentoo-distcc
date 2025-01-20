@@ -144,7 +144,7 @@ an `amd64` desktop can be used to cross-compile for an `arm64` Raspberry Pi and
 vice versa.
 
 Cross-compilation support is enabled out of the box without any user
-configuration. More architecture combinations can be added upon popular request.
+configuration. More architecture combinations can be added upon request.
 
 ## Testing
 
