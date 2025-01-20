@@ -3,7 +3,7 @@ ARG BASE=distcc
 
 FROM ksmanis/stage3:20250120@sha256:2262507cf7ba527620507cd068b82d71fd393849d9d3c689b8a220f935b16746 AS distcc
 ARG CROSSDEV_TARGETS=
-RUN --mount=type=bind,from=ghcr.io/ksmanis/gentoo-distcc:tcp,source=/var/cache/binpkgs,target=/cache \
+RUN --mount=type=bind,from=ksmanis/gentoo-distcc:tcp,source=/var/cache/binpkgs,target=/cache \
     --mount=type=bind,from=ksmanis/portage,source=/var/db/repos/gentoo,target=/var/db/repos/gentoo \
     set -eux; \
     cp -av /cache/. /var/cache/binpkgs; \
@@ -31,7 +31,7 @@ RUN --mount=type=bind,from=ghcr.io/ksmanis/gentoo-distcc:tcp,source=/var/cache/b
     find /var/cache/distfiles/ -mindepth 1 -delete -print
 
 FROM distcc AS distcc-ccache
-RUN --mount=type=bind,from=ghcr.io/ksmanis/gentoo-distcc:tcp-ccache,source=/var/cache/binpkgs,target=/cache \
+RUN --mount=type=bind,from=ksmanis/gentoo-distcc:tcp-ccache,source=/var/cache/binpkgs,target=/cache \
     --mount=type=bind,from=ksmanis/portage,source=/var/db/repos/gentoo,target=/var/db/repos/gentoo \
     set -eux; \
     cp -av /cache/. /var/cache/binpkgs; \
