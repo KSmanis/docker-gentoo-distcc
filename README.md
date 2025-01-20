@@ -21,6 +21,8 @@ Ubuntu or Windows box idling around. Docker is the only prerequisite.
   - `arm64`
   - `ppc64`
   - `x86`
+- Server-side caching using [ccache](#ccache)
+- Cross-compilation support using [crossdev](#crossdev)
 
 *Note*: Only the stable toolchain of these architectures is currently supported.
 
@@ -131,6 +133,18 @@ docker exec gentoo-distcc-tcp-ccache ccache -sv
 # SSH
 docker exec gentoo-distcc-ssh-ccache ccache -sv
 ```
+
+## Crossdev
+
+All `amd64` image variants support cross-compilation for the `arm64`
+architecture (specifically the `aarch64-unknown-linux-gnu` toolchain) and vice
+versa: all `arm64` image variants support cross-compilation for the `amd64`
+architecture (specifically the `x86_64-pc-linux-gnu` toolchain). In other words,
+an `amd64` desktop can be used to cross-compile for an `arm64` Raspberry Pi and
+vice versa.
+
+Cross-compilation support is enabled out of the box without any user
+configuration. More architecture combinations can be added upon popular request.
 
 ## Testing
 

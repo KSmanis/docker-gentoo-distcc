@@ -15,18 +15,22 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        arch: ["386", "amd64", "arm/v6", "arm/v7", "arm64", "ppc64le"]
-        crossdev_target: [""]  # skip crossdev by default
+        arch:
+          - id: "386"
+            crossdev_targets: []
+          - id: "amd64"
+            crossdev_targets: ["aarch64-unknown-linux-gnu"]
+          - id: "arm/v6"
+            crossdev_targets: []
+          - id: "arm/v7"
+            crossdev_targets: []
+          - id: "arm64"
+            crossdev_targets: ["x86_64-pc-linux-gnu"]
+          - id: "ppc64le"
+            crossdev_targets: []
         manifest: ["tcp", "ssh", "tcp-ccache", "ssh-ccache"]
-        include:
-          - arch: "arm64"
-            crossdev_target: "x86_64-pc-linux-gnu"
-            manifest: "tcp"
-          - arch: "arm64"
-            crossdev_target: "x86_64-pc-linux-gnu"
-            manifest: "tcp-ccache"
-    name: ${{ matrix.arch }}:${{ matrix.crossdev_target }}:${{ matrix.manifest }} image
-    runs-on: ${{ startsWith(matrix.arch, 'arm') && 'ubuntu-24.04-arm' || 'ubuntu-latest' }}
+    name: ${{ matrix.arch.id }}:${{ matrix.manifest }} image
+    runs-on: ${{ startsWith(matrix.arch.id, 'arm') && 'ubuntu-24.04-arm' || 'ubuntu-latest' }}
     continue-on-error: true
     outputs:
       manifests: ${{ steps.output.outputs.manifests }}
@@ -39,14 +43,14 @@ jobs:
           {
             echo "base=$(echo "${{ matrix.manifest }}" | sed 's/^\(tcp\|ssh\)/distcc/')"
             echo "stage3_version=$(sed -n 's#^FROM ksmanis/stage3:\([^[:space:]@]\+\).*#\1#p' Dockerfile)"
-            echo "tag=$(echo "${{ matrix.arch }}" | tr -d '/')-${{ matrix.manifest }}$(echo "${{ matrix.crossdev_target }}" | sed '/./ s/^/-/')"
+            echo "tag=$(echo "${{ matrix.arch.id }}" | tr -d '/')-${{ matrix.manifest }}"
             echo "target=distcc-$(echo "${{ matrix.manifest }}" | cut -d '-' -f 1)"
           } >> "$GITHUB_OUTPUT"
       - name: Set up QEMU
         uses: docker/setup-qemu-action@53851d14592bedcffcf25ea515637cff71ef929a # v3
-        if: matrix.arch == '386' || matrix.arch == 'ppc64le'
+        if: matrix.arch.id == '386' || matrix.arch.id == 'ppc64le'
         with:
-          platforms: ${{ matrix.arch }}
+          platforms: ${{ matrix.arch.id }}
       - name: Set up buildx
         uses: docker/setup-buildx-action@6524bf65af31da8d45b59e8c27de4bd072b392f5 # v3
       - name: Define Docker metadata
@@ -74,11 +78,11 @@ jobs:
         with:
           build-args: |
             BASE=${{ steps.prep.outputs.base }}
-            CROSSDEV_TARGET=${{ matrix.crossdev_target }}
+            CROSSDEV_TARGETS=${{ join(matrix.arch.crossdev_targets, ' ') }}
           context: .
           labels: ${{ steps.docker-metadata.outputs.labels }}
           tags: ${{ steps.docker-metadata.outputs.tags }}
-          platforms: linux/${{ matrix.arch }}
+          platforms: linux/${{ matrix.arch.id }}
           target: ${{ steps.prep.outputs.target }}
           load: true
       - name: Inspect image
@@ -86,7 +90,7 @@ jobs:
           docker image inspect ${{ steps.build.outputs.imageid }}
       - name: Test distcc
         env:
-          DOCKER_DEFAULT_PLATFORM: linux/${{ matrix.arch }}
+          DOCKER_DEFAULT_PLATFORM: linux/${{ matrix.arch.id }}
         run: |
           docker compose --ansi always -f docker-compose.test.yml -p test up \
             --exit-code-from distcc-${{ matrix.manifest }}-client \
