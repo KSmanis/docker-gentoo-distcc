@@ -38,7 +38,7 @@ jobs:
         run: |
           {
             echo "base=$(echo "${{ matrix.manifest }}" | sed 's/^\(tcp\|ssh\)/distcc/')"
-            echo "stage3_version=$(sed -n 's#^FROM ksmanis/stage3:\(\S\+\).*#\1#p' Dockerfile)"
+            echo "stage3_version=$(sed -n 's#^FROM ksmanis/stage3:\([^[:space:]@]\+\).*#\1#p' Dockerfile)"
             echo "tag=$(echo "${{ matrix.arch }}" | tr -d '/')-${{ matrix.manifest }}$(echo "${{ matrix.crossdev_target }}" | sed '/./ s/^/-/')"
             echo "target=distcc-$(echo "${{ matrix.manifest }}" | cut -d '-' -f 1)"
           } >> "$GITHUB_OUTPUT"
