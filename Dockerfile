@@ -7,7 +7,7 @@ RUN --mount=type=bind,from=ksmanis/gentoo-distcc:tcp,source=/var/cache/binpkgs,t
     --mount=type=bind,from=ksmanis/portage,source=/var/db/repos/gentoo,target=/var/db/repos/gentoo \
     set -eux; \
     cp -av /cache/. /var/cache/binpkgs; \
-    export EMERGE_DEFAULT_OPTS="--buildpkg --color=y --quiet-build --tree --usepkg --verbose"; \
+    export EMERGE_DEFAULT_OPTS="--buildpkg --color=y --getbinpkg --quiet-build --tree --verbose"; \
     emerge --info; \
     emerge distcc; \
     distcc --version; \
@@ -35,7 +35,7 @@ RUN --mount=type=bind,from=ksmanis/gentoo-distcc:tcp-ccache,source=/var/cache/bi
     --mount=type=bind,from=ksmanis/portage,source=/var/db/repos/gentoo,target=/var/db/repos/gentoo \
     set -eux; \
     cp -av /cache/. /var/cache/binpkgs; \
-    export EMERGE_DEFAULT_OPTS="--buildpkg --color=y --quiet-build --tree --usepkg --verbose"; \
+    export EMERGE_DEFAULT_OPTS="--buildpkg --color=y --getbinpkg --quiet-build --tree --verbose"; \
     emerge --info; \
     emerge ccache; \
     ccache --version; \
