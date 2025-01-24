@@ -7,7 +7,8 @@ RUN --mount=type=bind,from=ksmanis/gentoo-distcc:tcp,source=/var/cache/binpkgs,t
     --mount=type=bind,from=ksmanis/portage,source=/var/db/repos/gentoo,target=/var/db/repos/gentoo \
     set -eux; \
     cp -av /cache/. /var/cache/binpkgs; \
-    export EMERGE_DEFAULT_OPTS="--buildpkg --color=y --quiet-build --tree --usepkg --verbose"; \
+    getuto; \
+    export EMERGE_DEFAULT_OPTS="--buildpkg --color=y --getbinpkg --quiet-build --tree --verbose"; \
     emerge --info; \
     emerge distcc; \
     distcc --version; \
@@ -28,21 +29,24 @@ RUN --mount=type=bind,from=ksmanis/gentoo-distcc:tcp,source=/var/cache/binpkgs,t
     emerge --oneshot gentoolkit; \
     eclean packages; \
     CLEAN_DELAY=0 emerge --depclean gentoolkit; \
-    find /var/cache/distfiles/ -mindepth 1 -delete -print
+    find /var/cache/distfiles/ -mindepth 1 -delete -print; \
+    rm -rf /etc/portage/gnupg/
 
 FROM distcc AS distcc-ccache
 RUN --mount=type=bind,from=ksmanis/gentoo-distcc:tcp-ccache,source=/var/cache/binpkgs,target=/cache \
     --mount=type=bind,from=ksmanis/portage,source=/var/db/repos/gentoo,target=/var/db/repos/gentoo \
     set -eux; \
     cp -av /cache/. /var/cache/binpkgs; \
-    export EMERGE_DEFAULT_OPTS="--buildpkg --color=y --quiet-build --tree --usepkg --verbose"; \
+    getuto; \
+    export EMERGE_DEFAULT_OPTS="--buildpkg --color=y --getbinpkg --quiet-build --tree --verbose"; \
     emerge --info; \
     emerge ccache; \
     ccache --version; \
     emerge --oneshot gentoolkit; \
     eclean packages; \
     CLEAN_DELAY=0 emerge --depclean gentoolkit; \
-    find /var/cache/distfiles/ -mindepth 1 -delete -print
+    find /var/cache/distfiles/ -mindepth 1 -delete -print; \
+    rm -rf /etc/portage/gnupg/
 ARG CCACHE_DIR=/var/cache/ccache
 ENV CCACHE_DIR="$CCACHE_DIR"
 ENV PATH="/usr/lib/ccache/bin${PATH:+:$PATH}"
