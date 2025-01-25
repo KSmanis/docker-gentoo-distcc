@@ -46,7 +46,7 @@ repos:
           - mdformat-tables
         args: ["--number", "--wrap", "80"]
   - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.43.0
+    rev: v0.44.0
     hooks:
       - id: markdownlint
   # Shell
