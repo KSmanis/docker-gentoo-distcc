@@ -47,7 +47,7 @@ jobs:
             echo "target=distcc-$(echo "${{ matrix.manifest }}" | cut -d '-' -f 1)"
           } >> "$GITHUB_OUTPUT"
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@5964de0df58d5ad28b04d8fe2e6b80ad47105b91 # v3
+        uses: docker/setup-qemu-action@29109295f81e9208d7d86ff1c6c12d2833863392 # v3
         if: matrix.arch.id == '386' || matrix.arch.id == 'ppc64le'
         with:
           platforms: ${{ matrix.arch.id }}
