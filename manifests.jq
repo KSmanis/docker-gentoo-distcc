@@ -7,8 +7,6 @@
 ) | map(
   [
     .tag |= sub("^\($tag_prefix)"; "tcp"),
-    .tag |= sub("^\($tag_prefix)"; "ssh"),
     .tag |= sub("^\($tag_prefix)"; "tcp-ccache"),
-    .tag |= sub("^\($tag_prefix)"; "ssh-ccache")
   ]
 ) | flatten

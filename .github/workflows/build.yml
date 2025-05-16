@@ -28,7 +28,7 @@ jobs:
             crossdev_targets: ["x86_64-pc-linux-gnu"]
           - id: "ppc64le"
             crossdev_targets: []
-        manifest: ["tcp", "ssh", "tcp-ccache", "ssh-ccache"]
+        manifest: ["tcp", "tcp-ccache"]
     name: ${{ matrix.arch.id }}:${{ matrix.manifest }} image
     runs-on: ${{ startsWith(matrix.arch.id, 'arm') && 'ubuntu-24.04-arm' || 'ubuntu-latest' }}
     continue-on-error: true
@@ -41,7 +41,7 @@ jobs:
         id: prep
         run: |
           {
-            echo "base=$(echo "${{ matrix.manifest }}" | sed 's/^\(tcp\|ssh\)/distcc/')"
+            echo "base=$(echo "${{ matrix.manifest }}" | sed 's/^tcp/distcc/')"
             echo "stage3_version=$(sed -n 's#^FROM ksmanis/stage3:\([^[:space:]@]\+\).*#\1#p' Dockerfile)"
             echo "tag=$(echo "${{ matrix.arch.id }}" | tr -d '/')-${{ matrix.manifest }}"
             echo "target=distcc-$(echo "${{ matrix.manifest }}" | cut -d '-' -f 1)"

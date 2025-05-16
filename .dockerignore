@@ -1,8 +1,6 @@
 # Ignore everything...
 *
 # ...except the following
-!docker-entrypoint-ssh.sh
-!docker-entrypoint-tcp.sh
-!healthcheck-tcp.sh
-!sshd_config
+!docker-entrypoint.sh
+!docker-healthcheck.sh
 !tests/

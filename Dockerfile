@@ -86,22 +86,13 @@ RUN set -eux; \
     rm -rf "${GNUPGHOME}" /usr/local/bin/tini.asc /usr/local/bin/tini.sha256sum; \
     chmod +x /usr/local/bin/tini; \
     tini --version
-COPY docker-entrypoint-tcp.sh /usr/local/bin/docker-entrypoint.sh
-COPY healthcheck-tcp.sh /usr/local/bin/healthcheck.sh
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+COPY docker-healthcheck.sh /usr/local/bin/docker-healthcheck.sh
 # distccd exits with code 143 for SIGTERM; remap it to 0
 ENTRYPOINT ["tini", "-e", "143", "--", "docker-entrypoint.sh"]
 EXPOSE 3632
-HEALTHCHECK CMD ["healthcheck.sh"]
+HEALTHCHECK CMD ["docker-healthcheck.sh"]
 USER distcc
-
-# hadolint ignore=DL3006
-FROM $BASE AS distcc-ssh
-ENV SSH_USERNAME=distcc-ssh
-COPY --chmod=600 sshd_config /etc/ssh/sshd_config.d/0000000distcc.conf
-COPY docker-entrypoint-ssh.sh /usr/local/bin/docker-entrypoint.sh
-ENTRYPOINT ["docker-entrypoint.sh"]
-EXPOSE 22
-HEALTHCHECK CMD </dev/tcp/localhost/22 || exit 1
 
 # hadolint ignore=DL3006
 FROM $BASE AS distcc-tcp-test
@@ -115,8 +106,3 @@ ENV DISTCC_BACKOFF_PERIOD=0
 ENV DISTCC_FALLBACK=0
 ENV DISTCC_VERBOSE=1
 CMD ["./test.sh"]
-
-FROM distcc-tcp-test AS distcc-ssh-test
-ARG TEST_USERNAME=notroot
-COPY --chown=${TEST_USERNAME} --chmod=600 tests/ssh_config .ssh/config
-COPY --chown=${TEST_USERNAME} --chmod=600 tests/ssh_ed25519_key .ssh/id_ed25519
