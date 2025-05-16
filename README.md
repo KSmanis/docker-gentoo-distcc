@@ -37,33 +37,25 @@ Ubuntu or Windows box idling around. Docker is the only prerequisite.
 On the worker node(s), run the containerized distcc server (distccd):
 
 ```shell
-docker run -d -p 3632:3632 --name gentoo-distcc-tcp --rm ksmanis/gentoo-distcc:tcp
+docker run -d -p 3632:3632 --name gentoo-distcc --rm ksmanis/gentoo-distcc:tcp
 ```
 
 distccd should now be accessible from all interfaces at port 3632
-(`0.0.0.0:3632`):
+(`0.0.0.0:3632`).
 
-```shell
-$ docker ps
-CONTAINER ID        IMAGE                       COMMAND                  CREATED             STATUS              PORTS                    NAMES
-405bb6e87ce8        ksmanis/gentoo-distcc:tcp   "tini -e 143 -- dock…"   2 seconds ago       Up 2 seconds        0.0.0.0:3632->3632/tcp   gentoo-distcc-tcp
-```
+> [!NOTE]
+>
+> Only private IP addresses are allowed to connect to distccd by default.
 
 Command-line arguments are passed on verbatim to distccd. For instance, you can
 turn on the built-in HTTP statistics server:
 
 ```shell
-docker run -d -p 3632-3633:3632-3633 --name gentoo-distcc-tcp --rm ksmanis/gentoo-distcc:tcp --stats
+docker run -d -p 3632-3633:3632-3633 --name gentoo-distcc --rm ksmanis/gentoo-distcc:tcp --stats
 ```
 
 The statistics server should now be accessible from all interfaces at port 3633
-(`0.0.0.0:3633`):
-
-```shell
-$ docker ps
-CONTAINER ID        IMAGE                       COMMAND                  CREATED             STATUS              PORTS                              NAMES
-4e553e359782        ksmanis/gentoo-distcc:tcp   "tini -e 143 -- dock…"   3 seconds ago       Up 2 seconds        0.0.0.0:3632-3633->3632-3633/tcp   gentoo-distcc-tcp
-```
+(`0.0.0.0:3633`).
 
 For a full list of options refer to
 [distccd(1)](https://linux.die.net/man/1/distccd).
@@ -75,7 +67,7 @@ in enabling server-side caching with `ccache` to avoid redundant recompilations.
 To do so, pull the `tcp-ccache` tag:
 
 ```shell
-docker run -d -p 3632:3632 --name gentoo-distcc-tcp-ccache --rm ksmanis/gentoo-distcc:tcp-ccache
+docker run -d -p 3632:3632 --name gentoo-distcc-ccache --rm ksmanis/gentoo-distcc:tcp-ccache
 ```
 
 The directory `/var/cache/ccache` automatically persists in an anonymous Docker
@@ -85,7 +77,7 @@ persistence guarantees.
 Ccache statistics can be queried as follows:
 
 ```shell
-docker exec gentoo-distcc-tcp-ccache ccache -sv
+docker exec gentoo-distcc-ccache ccache -sv
 ```
 
 ## Crossdev
