@@ -1,0 +1,2 @@
+# Disable healthcheck penalties
+PerSourcePenaltyExemptList 127.0.0.1,::1

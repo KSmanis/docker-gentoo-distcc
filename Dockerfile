@@ -97,6 +97,7 @@ USER distcc
 # hadolint ignore=DL3006
 FROM $BASE AS distcc-ssh
 ENV SSH_USERNAME=distcc-ssh
+COPY --chmod=600 sshd_config /etc/ssh/sshd_config.d/0000000distcc.conf
 COPY docker-entrypoint-ssh.sh /usr/local/bin/docker-entrypoint.sh
 ENTRYPOINT ["docker-entrypoint.sh"]
 EXPOSE 22
