@@ -4,7 +4,7 @@ services:
     build:
       target: distcc-tcp
     healthcheck:
-      interval: 3s
+      start_interval: 1s
       start_period: 30s
     command: ["--enable-tcp-insecure", "--verbose"]
   distcc-tcp-client:
@@ -22,7 +22,7 @@ services:
         BASE: distcc-ccache
       target: distcc-tcp
     healthcheck:
-      interval: 3s
+      start_interval: 1s
       start_period: 30s
     command: ["--enable-tcp-insecure", "--verbose"]
     volumes:
