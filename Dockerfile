@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1.17.1@sha256:38387523653efa0039f8e1c89bb74a30504e76ee9f565e25c9a09841f9427b05
 ARG BASE=distcc
 
-FROM ksmanis/stage3:20250616@sha256:466f6e31e9cec87db0e579e036cfb8351e5445ab37194ee112be72a53f54c552 AS distcc
+FROM ksmanis/stage3:20250623@sha256:5ad539b46db3bccd97fb3a782ef34400aad348676dbf868d055ac1ecc18f884b AS distcc
 ARG CROSSDEV_TARGETS=
 RUN --mount=type=bind,from=ksmanis/gentoo-distcc:tcp,source=/var/cache/binpkgs,target=/cache \
     --mount=type=bind,from=ksmanis/portage,source=/var/db/repos/gentoo,target=/var/db/repos/gentoo \
