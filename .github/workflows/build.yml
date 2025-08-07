@@ -92,7 +92,7 @@ jobs:
         env:
           DOCKER_DEFAULT_PLATFORM: linux/${{ matrix.arch.id }}
         run: |
-          docker compose --ansi always --progress plain -f docker-compose.test.yml -p test up \
+          docker compose --ansi always --progress auto -f docker-compose.test.yml -p test up \
             --exit-code-from distcc-${{ matrix.manifest }}-client \
             distcc-${{ matrix.manifest }}-client distcc-${{ matrix.manifest }}-server
       - name: Log in to Docker Hub
