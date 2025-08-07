@@ -17,7 +17,7 @@ jobs:
         run: echo "PYTHON_VERSION=$(python -V | cut -d' ' -f2)" >> "$GITHUB_ENV"
       - name: Cache pre-commit hooks
         id: cache-pre-commit
-        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4
+        uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4
         with:
           path: ~/.cache/pre-commit
           key: pre-commit-${{ env.PYTHON_VERSION }}-${{ hashFiles('.pre-commit-config.yaml') }}
