@@ -6,6 +6,8 @@
   }
 ) | map(
   [
+    .tag |= sub("^\($tag_prefix)"; "ccache"),
+    .tag |= sub("^\($tag_prefix)"; "latest"),
     .tag |= sub("^\($tag_prefix)"; "tcp"),
     .tag |= sub("^\($tag_prefix)"; "tcp-ccache")
   ]
