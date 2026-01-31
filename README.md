@@ -10,13 +10,6 @@
 Decrease Gentoo compilation times by leveraging spare resources, such as an
 Ubuntu or Windows box idling around. Docker is the only prerequisite.
 
-> [!IMPORTANT]
->
-> The SSH image variants have been deprecated as of 2025-05-16 in order to ease
-> maintenance and reduce resource usage. No SSH images will be built moving
-> forward. As an alternative, consider using the TCP image variants either with
-> a VPN (recommended) or a reverse SSH tunnel.
-
 ## Features
 
 - Out-of-the-box support for the following Gentoo architectures:
