@@ -1,41 +1,65 @@
----
+default_install_hook_types:
+  - commit-msg
+  - pre-commit
 repos:
   # Meta
   - repo: meta
     hooks:
       - id: check-hooks-apply
+        priority: &read-only 1000
       - id: check-useless-excludes
+        priority: *read-only
   # Generic
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:
       - id: check-executables-have-shebangs
+        priority: *read-only
       - id: check-shebang-scripts-are-executable
+        priority: *read-only
       - id: end-of-file-fixer
+        priority: &write-serial null
       - id: trailing-whitespace
+        priority: *write-serial
+  - repo: https://github.com/renovatebot/pre-commit-hooks
+    rev: 42.84.0
+    hooks:
+      - id: renovate-config-validator
+        args: ["--strict"]
+        priority: *read-only
   # Docker
   - repo: https://github.com/hadolint/hadolint
     rev: v2.14.0
     hooks:
       - id: hadolint-docker
+        priority: *read-only
+  - repo: https://github.com/python-jsonschema/check-jsonschema
+    rev: 0.36.0
+    hooks:
+      - id: check-compose-spec
+        priority: *read-only
   # Git
   - repo: https://github.com/jorisroovers/gitlint
     rev: v0.19.1
     hooks:
       - id: gitlint
+        priority: *read-only
       - id: gitlint-ci
   # GitHub Actions
   - repo: https://github.com/rhysd/actionlint
     rev: v1.7.10
     hooks:
       - id: actionlint
+        priority: *read-only
   # JSON
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:
       - id: pretty-format-json
-        args: ["--autofix"]
+        args: ["--autofix", "--no-ensure-ascii"]
+        priority: &write-parallel 999
       - id: check-json
+        priority: *read-only
   # Markdown
   - repo: https://github.com/executablebooks/mdformat
     rev: 1.0.0
@@ -43,18 +67,27 @@ repos:
       - id: mdformat
         additional_dependencies:
           - mdformat-gfm
-        args: ["--number", "--wrap", "80"]
+        args: ["--number", "--wrap=80"]
+        priority: *write-parallel
   - repo: https://github.com/igorshubovych/markdownlint-cli
     rev: v0.47.0
     hooks:
       - id: markdownlint
+        priority: *read-only
   # Shell
   - repo: https://github.com/shellcheck-py/shellcheck-py
     rev: v0.11.0.1
     hooks:
       - id: shellcheck
+        priority: *read-only
   # YAML
+  - repo: https://github.com/google/yamlfmt
+    rev: v0.21.0
+    hooks:
+      - id: yamlfmt
+        priority: *write-parallel
   - repo: https://github.com/adrienverge/yamllint
     rev: v1.38.0
     hooks:
       - id: yamllint
+        priority: *read-only

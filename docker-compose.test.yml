@@ -1,4 +1,3 @@
----
 services:
   distcc-tcp-server:
     build:
@@ -15,7 +14,6 @@ services:
       target: distcc-tcp-test
     environment:
       - DISTCC_HOSTS=distcc-tcp-server
-
   distcc-tcp-ccache-server:
     build:
       args:
@@ -39,6 +37,5 @@ services:
       - DISTCC_HOSTS=distcc-tcp-ccache-server
     volumes:
       - distcc-tcp-ccache:/var/cache/ccache
-
 volumes:
   distcc-tcp-ccache:

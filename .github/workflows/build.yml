@@ -1,15 +1,8 @@
----
 name: build
-
-on:
-  push:
-  pull_request:
-  workflow_dispatch:
-
+on: [pull_request, push, workflow_dispatch]
 env:
   DOCKERHUB_REPOSITORY: ksmanis/gentoo-distcc
   DOCKERHUB_USERNAME: ksmanis
-
 jobs:
   images:
     strategy:
@@ -35,7 +28,7 @@ jobs:
     outputs:
       manifests: ${{ steps.output.outputs.manifests }}
     steps:
-      - name: Check out code
+      - name: Check out repository
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
       - name: Prepare build variables
         id: prep

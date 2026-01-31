@@ -1,6 +1,4 @@
----
 name: dockerhub-description
-
 on:
   push:
     branches:
@@ -8,16 +6,14 @@ on:
     paths:
       - .github/workflows/dockerhub-description.yml
       - README.md
-
 env:
   DOCKERHUB_REPOSITORY: ksmanis/gentoo-distcc
   DOCKERHUB_USERNAME: ksmanis
-
 jobs:
   dockerhub-description:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out code
+      - name: Check out repository
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
       - name: Update Docker Hub description
         uses: peter-evans/dockerhub-description@1b9a80c056b620d92cedb9d9b5a223409c68ddfa # v5

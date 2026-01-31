@@ -1,51 +1,24 @@
----
 name: lint
-
-on: [push, pull_request]
-
+on: [pull_request, push]
 jobs:
-  pre-commit:
+  prek:
     runs-on: ubuntu-latest
+    env:
+      PREK_COLOR: always
     steps:
-      - name: Check out code
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
-        with:
-          fetch-depth: 2
-      - name: Install pre-commit
-        run: pipx install pre-commit
-      - name: Identify Python version
-        run: echo "PYTHON_VERSION=$(python -V | cut -d' ' -f2)" >> "$GITHUB_ENV"
-      - name: Cache pre-commit hooks
-        id: cache-pre-commit
-        uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5
-        with:
-          path: ~/.cache/pre-commit
-          key: pre-commit-${{ env.PYTHON_VERSION }}-${{ hashFiles('.pre-commit-config.yaml') }}
-          restore-keys: |
-            pre-commit-${{ env.PYTHON_VERSION }}-
-            pre-commit-
-      - name: Prune pre-commit hooks
-        if: steps.cache-pre-commit.outputs.cache-hit != 'true'
-        run: pre-commit gc
-      - name: Run gitlint
-        run: pre-commit run --color=always --hook-stage manual gitlint-ci
-      - name: Run pre-commit
-        run: pre-commit run --all-files --color=always --show-diff-on-failure
-
-  super-linter:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out code
+      - name: Check out repository
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
         with:
           fetch-depth: 0
-      - name: Run super-linter
-        uses: github/super-linter@45fc0d88288beee4701c62761281edfee85655d7 # v5.0.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VALIDATE_BASH: false
-          VALIDATE_DOCKERFILE_HADOLINT: false
-          VALIDATE_GITHUB_ACTIONS: false
-          VALIDATE_GITLEAKS: false
-          VALIDATE_MARKDOWN: false
-          VALIDATE_YAML: false
+      - name: Set up Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6
+        with:
+          python-version: '3.x'
+      - name: Set up prek
+        uses: j178/prek-action@564dda4cfa5e96aafdc4a5696c4bf7b46baae5ac # v1.1.0
+        with:
+          install-only: true
+      - name: Run gitlint
+        run: prek run --hook-stage manual gitlint-ci
+      - name: Run prek
+        run: prek run --all-files --show-diff-on-failure
