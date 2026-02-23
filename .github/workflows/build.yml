@@ -41,7 +41,7 @@ jobs:
         run: |
           {
             echo "stage3_version=$(sed -n 's#^FROM ksmanis/stage3:\([^[:space:]@]\+\).*#\1#p' Dockerfile)"
-            echo "tag=$(echo "${{ matrix.arch.id }}" | tr -d '/')-${{ matrix.manifest.id }}"
+            echo "tag_arch=$(echo "${{ matrix.arch.id }}" | tr -d '/')"
           } >> "$GITHUB_OUTPUT"
       - name: Set up QEMU
         uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130 # v3
@@ -63,10 +63,10 @@ jobs:
             org.opencontainers.image.title=gentoo-distcc
             org.opencontainers.image.authors=Konstantinos Smanis <konstantinos.smanis@gmail.com>
           tags: |
-            type=ref,event=branch,prefix=${{ steps.prep.outputs.tag }}-branch-
-            type=ref,event=pr,prefix=${{ steps.prep.outputs.tag }}-pr-
-            type=raw,value=${{ steps.prep.outputs.tag }}-${{ steps.prep.outputs.stage3_version }},enable={{is_default_branch}}
-            type=raw,value=${{ steps.prep.outputs.tag }},enable={{is_default_branch}}
+            type=ref,event=branch,prefix=${{ steps.prep.outputs.tag_arch }}-branch-,suffix=-${{ matrix.manifest.id }}
+            type=ref,event=pr,prefix=${{ steps.prep.outputs.tag_arch }}-pr-,suffix=-${{ matrix.manifest.id }}
+            type=raw,value=${{ steps.prep.outputs.tag_arch }}-${{ steps.prep.outputs.stage3_version }}-${{ matrix.manifest.id }},enable={{is_default_branch}}
+            type=raw,value=${{ steps.prep.outputs.tag_arch }}-${{ matrix.manifest.id }},enable={{is_default_branch}}
       - name: Build image
         id: build
         uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
@@ -108,7 +108,7 @@ jobs:
       - name: Prepare outputs
         id: output
         run: |
-          echo "manifests=$(echo "${DOCKER_METADATA_OUTPUT_JSON}" | jq -cf --arg tag_prefix "${{ steps.prep.outputs.tag }}" manifests.jq)" >> "$GITHUB_OUTPUT"
+          echo "manifests=$(echo "${DOCKER_METADATA_OUTPUT_JSON}" | jq -cf manifests.jq)" >> "$GITHUB_OUTPUT"
   manifests:
     needs: images
     strategy:
