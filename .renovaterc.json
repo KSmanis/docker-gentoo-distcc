@@ -21,7 +21,8 @@
       ],
       "matchPackageNames": [
         "ksmanis/stage3"
-      ]
+      ],
+      "versioning": "regex:^(?<patch>\\d{8})$"
     }
   ],
   "semanticCommits": "enabled"
