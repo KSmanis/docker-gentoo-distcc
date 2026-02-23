@@ -30,7 +30,7 @@ Ubuntu or Windows box idling around. Docker is the only prerequisite.
 On the worker node(s), run the containerized distcc server (distccd):
 
 ```shell
-docker run -d -p 3632:3632 --name gentoo-distcc --rm ksmanis/gentoo-distcc:tcp
+docker run -d -p 3632:3632 --name gentoo-distcc --rm ksmanis/gentoo-distcc
 ```
 
 distccd should now be accessible from all interfaces at port 3632
@@ -44,7 +44,7 @@ Command-line arguments are passed on verbatim to distccd. For instance, you can
 turn on the built-in HTTP statistics server:
 
 ```shell
-docker run -d -p 3632-3633:3632-3633 --name gentoo-distcc --rm ksmanis/gentoo-distcc:tcp --stats
+docker run -d -p 3632-3633:3632-3633 --name gentoo-distcc --rm ksmanis/gentoo-distcc --stats
 ```
 
 The statistics server should now be accessible from all interfaces at port 3633
@@ -57,10 +57,10 @@ For a full list of options refer to
 
 If you share a worker instance between multiple clients, you might be interested
 in enabling server-side caching with `ccache` to avoid redundant recompilations.
-To do so, pull the `tcp-ccache` tag:
+To do so, pull the `ccache` tag:
 
 ```shell
-docker run -d -p 3632:3632 --name gentoo-distcc-ccache --rm ksmanis/gentoo-distcc:tcp-ccache
+docker run -d -p 3632:3632 --name gentoo-distcc-ccache --rm ksmanis/gentoo-distcc:ccache
 ```
 
 The directory `/var/cache/ccache` automatically persists in an anonymous Docker

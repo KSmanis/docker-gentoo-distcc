@@ -1,41 +1,41 @@
 services:
-  distcc-tcp-server:
+  distcc-server:
     build:
-      target: distcc-tcp
+      target: distcc
     healthcheck:
       start_interval: 1s
       start_period: 30s
     command: ["--enable-tcp-insecure", "--verbose"]
-  distcc-tcp-client:
+  distcc-client:
     depends_on:
-      distcc-tcp-server:
+      distcc-server:
         condition: service_healthy
     build:
-      target: distcc-tcp-test
+      target: test
     environment:
-      - DISTCC_HOSTS=distcc-tcp-server
-  distcc-tcp-ccache-server:
+      - DISTCC_HOSTS=distcc-server
+  distcc-ccache-server:
     build:
       args:
-        BASE: distcc-ccache
-      target: distcc-tcp
+        BASE: build-ccache
+      target: distcc
     healthcheck:
       start_interval: 1s
       start_period: 30s
     command: ["--enable-tcp-insecure", "--verbose"]
     volumes:
-      - distcc-tcp-ccache:/var/cache/ccache
-  distcc-tcp-ccache-client:
+      - distcc-ccache:/var/cache/ccache
+  distcc-ccache-client:
     depends_on:
-      distcc-tcp-ccache-server:
+      distcc-ccache-server:
         condition: service_healthy
     build:
       args:
-        BASE: distcc-ccache
-      target: distcc-tcp-test
+        BASE: build-ccache
+      target: test
     environment:
-      - DISTCC_HOSTS=distcc-tcp-ccache-server
+      - DISTCC_HOSTS=distcc-ccache-server
     volumes:
-      - distcc-tcp-ccache:/var/cache/ccache
+      - distcc-ccache:/var/cache/ccache
 volumes:
-  distcc-tcp-ccache:
+  distcc-ccache:

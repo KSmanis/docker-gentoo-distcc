@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1.21.0@sha256:27f9262d43452075f3c410287a2c43f5ef1bf7ec2bb06e8c9eeb1b8d453087bc
-ARG BASE=distcc
+ARG BASE=build-base
 
-FROM ksmanis/stage3:20251229@sha256:d3f8cca07b54dcea960ac8b8863e24f32573c6f173b695060cca48667a399c22 AS distcc
+FROM ksmanis/stage3:20251229@sha256:d3f8cca07b54dcea960ac8b8863e24f32573c6f173b695060cca48667a399c22 AS build-base
 ARG CROSSDEV_TARGETS=
 RUN --mount=type=bind,from=ksmanis/gentoo-distcc:tcp,source=/var/cache/binpkgs,target=/cache \
     --mount=type=bind,from=ksmanis/portage,source=/var/db/repos/gentoo,target=/var/db/repos/gentoo \
@@ -32,7 +32,7 @@ RUN --mount=type=bind,from=ksmanis/gentoo-distcc:tcp,source=/var/cache/binpkgs,t
     find /var/cache/distfiles/ -mindepth 1 -delete -print; \
     rm -rf /etc/portage/gnupg/
 
-FROM distcc AS distcc-ccache
+FROM build-base AS build-ccache
 RUN --mount=type=bind,from=ksmanis/gentoo-distcc:tcp-ccache,source=/var/cache/binpkgs,target=/cache \
     --mount=type=bind,from=ksmanis/portage,source=/var/db/repos/gentoo,target=/var/db/repos/gentoo \
     set -eux; \
@@ -59,7 +59,7 @@ RUN set -eux; \
 VOLUME ["$CCACHE_DIR"]
 
 # hadolint ignore=DL3006
-FROM $BASE AS distcc-tcp
+FROM $BASE AS distcc
 ARG TARGETPLATFORM
 # renovate: datasource=github-tags depName=krallin/tini
 ARG TINI_VERSION=0.19.0
@@ -95,7 +95,7 @@ HEALTHCHECK CMD ["docker-healthcheck.sh"]
 USER distcc
 
 # hadolint ignore=DL3006
-FROM $BASE AS distcc-tcp-test
+FROM $BASE AS test
 ARG TEST_USERNAME=notroot
 RUN useradd -G distcc ${TEST_USERNAME}
 WORKDIR /home/${TEST_USERNAME}/

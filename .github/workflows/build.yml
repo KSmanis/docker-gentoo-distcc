@@ -21,8 +21,14 @@ jobs:
             crossdev_targets: ["x86_64-pc-linux-gnu"]
           - id: "ppc64le"
             crossdev_targets: []
-        manifest: ["tcp", "tcp-ccache"]
-    name: ${{ matrix.arch.id }}:${{ matrix.manifest }} image
+        manifest:
+          - base: build-base
+            id: latest
+            test_target: distcc
+          - base: build-ccache
+            id: ccache
+            test_target: distcc-ccache
+    name: ${{ matrix.arch.id }}:${{ matrix.manifest.id }} image
     runs-on: ${{ startsWith(matrix.arch.id, 'arm') && 'ubuntu-24.04-arm' || 'ubuntu-latest' }}
     continue-on-error: true
     outputs:
@@ -34,10 +40,8 @@ jobs:
         id: prep
         run: |
           {
-            echo "base=$(echo "${{ matrix.manifest }}" | sed 's/^tcp/distcc/')"
             echo "stage3_version=$(sed -n 's#^FROM ksmanis/stage3:\([^[:space:]@]\+\).*#\1#p' Dockerfile)"
-            echo "tag=$(echo "${{ matrix.arch.id }}" | tr -d '/')-${{ matrix.manifest }}"
-            echo "target=distcc-$(echo "${{ matrix.manifest }}" | cut -d '-' -f 1)"
+            echo "tag=$(echo "${{ matrix.arch.id }}" | tr -d '/')-${{ matrix.manifest.id }}"
           } >> "$GITHUB_OUTPUT"
       - name: Set up QEMU
         uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130 # v3
@@ -59,9 +63,7 @@ jobs:
             org.opencontainers.image.title=gentoo-distcc
             org.opencontainers.image.authors=Konstantinos Smanis <konstantinos.smanis@gmail.com>
           tags: |
-            type=ref,event=branch,prefix=${{ steps.prep.outputs.tag }}-,suffix=-{{sha}}
-            type=ref,event=branch,prefix=${{ steps.prep.outputs.tag }}-
-            type=ref,event=pr,prefix=${{ steps.prep.outputs.tag }}-pr-,suffix=-{{sha}}
+            type=ref,event=branch,prefix=${{ steps.prep.outputs.tag }}-branch-
             type=ref,event=pr,prefix=${{ steps.prep.outputs.tag }}-pr-
             type=raw,value=${{ steps.prep.outputs.tag }}-${{ steps.prep.outputs.stage3_version }},enable={{is_default_branch}}
             type=raw,value=${{ steps.prep.outputs.tag }},enable={{is_default_branch}}
@@ -70,13 +72,13 @@ jobs:
         uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
         with:
           build-args: |
-            BASE=${{ steps.prep.outputs.base }}
+            BASE=${{ matrix.manifest.base }}
             CROSSDEV_TARGETS=${{ join(matrix.arch.crossdev_targets, ' ') }}
           context: .
           labels: ${{ steps.docker-metadata.outputs.labels }}
           tags: ${{ steps.docker-metadata.outputs.tags }}
           platforms: linux/${{ matrix.arch.id }}
-          target: ${{ steps.prep.outputs.target }}
+          target: distcc
           load: true
       - name: Inspect image
         run: |
@@ -86,8 +88,8 @@ jobs:
           DOCKER_DEFAULT_PLATFORM: linux/${{ matrix.arch.id }}
         run: |
           docker compose -f docker-compose.test.yml -p test up \
-            --exit-code-from distcc-${{ matrix.manifest }}-client \
-            distcc-${{ matrix.manifest }}-client distcc-${{ matrix.manifest }}-server
+            --exit-code-from ${{ matrix.manifest.test_target }}-client \
+            ${{ matrix.manifest.test_target }}-client ${{ matrix.manifest.test_target }}-server
       - name: Log in to Docker Hub
         uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
         with:
@@ -113,15 +115,15 @@ jobs:
       fail-fast: false
       matrix:
         manifest: ${{ fromJson(needs.images.outputs.manifests) }}
-    name: ${{ matrix.manifest.registry }}:${{ matrix.manifest.tag }} manifest
+    name: ${{ matrix.manifest.registry }}:${{ matrix.manifest.manifest_tag }} manifest
     runs-on: ubuntu-latest
     env:
-      MANIFEST: ${{ matrix.manifest.repo }}:${{ matrix.manifest.tag }}
+      MANIFEST: ${{ matrix.manifest.repo }}:${{ matrix.manifest.manifest_tag }}
     steps:
       - name: Create manifest
         run: |
           for arch in 386 amd64 armv6 armv7 arm64 ppc64le; do
-            image="${{ matrix.manifest.repo }}:${arch}-${{ matrix.manifest.tag }}"
+            image="${{ matrix.manifest.repo }}:${arch}-${{ matrix.manifest.image_tag }}"
             docker manifest create --amend "${MANIFEST}" "${image}" || true
           done
       - name: Log in to Docker Hub
