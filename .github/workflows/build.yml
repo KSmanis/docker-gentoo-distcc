@@ -5,6 +5,12 @@ env:
   DOCKERHUB_USERNAME: ksmanis
 jobs:
   images:
+    continue-on-error: true
+    permissions:
+      attestations: write
+      contents: read
+      id-token: write
+      packages: write
     strategy:
       fail-fast: false
       matrix:
@@ -30,7 +36,6 @@ jobs:
             test_target: distcc-ccache
     name: ${{ matrix.arch.id }}:${{ matrix.manifest.id }} image
     runs-on: ${{ startsWith(matrix.arch.id, 'arm') && 'ubuntu-24.04-arm' || 'ubuntu-latest' }}
-    continue-on-error: true
     outputs:
       manifests: ${{ steps.output.outputs.manifests }}
     steps:
@@ -76,10 +81,10 @@ jobs:
             CROSSDEV_TARGETS=${{ join(matrix.arch.crossdev_targets, ' ') }}
           context: .
           labels: ${{ steps.docker-metadata.outputs.labels }}
-          tags: ${{ steps.docker-metadata.outputs.tags }}
-          platforms: linux/${{ matrix.arch.id }}
-          target: distcc
           load: true
+          platforms: linux/${{ matrix.arch.id }}
+          tags: ${{ steps.docker-metadata.outputs.tags }}
+          target: distcc
       - name: Inspect image
         run: |
           docker image inspect ${{ steps.build.outputs.imageid }}
@@ -102,30 +107,52 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Push image
-        run: |
-          docker push --all-tags "docker.io/${DOCKERHUB_REPOSITORY}"
-          docker push --all-tags "ghcr.io/${DOCKERHUB_REPOSITORY}"
+        id: push
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
+        with:
+          build-args: |
+            BASE=${{ matrix.manifest.base }}
+            CROSSDEV_TARGETS=${{ join(matrix.arch.crossdev_targets, ' ') }}
+          context: .
+          labels: ${{ steps.docker-metadata.outputs.labels }}
+          platforms: linux/${{ matrix.arch.id }}
+          provenance: mode=max
+          push: true
+          sbom: true
+          tags: ${{ steps.docker-metadata.outputs.tags }}
+          target: distcc
+      - name: Attest Docker Hub image
+        uses: actions/attest-build-provenance@96278af6caaf10aea03fd8d33a09a777ca52d62f # v3
+        with:
+          push-to-registry: true
+          subject-digest: ${{ steps.push.outputs.digest }}
+          subject-name: docker.io/${{ env.DOCKERHUB_REPOSITORY }}
+      - name: Attest GitHub Container registry image
+        uses: actions/attest-build-provenance@96278af6caaf10aea03fd8d33a09a777ca52d62f # v3
+        with:
+          push-to-registry: true
+          subject-digest: ${{ steps.push.outputs.digest }}
+          subject-name: ghcr.io/${{ env.DOCKERHUB_REPOSITORY }}
       - name: Prepare outputs
         id: output
         run: |
           echo "manifests=$(echo "${DOCKER_METADATA_OUTPUT_JSON}" | jq -cf manifests.jq)" >> "$GITHUB_OUTPUT"
   manifests:
     needs: images
+    permissions:
+      attestations: write
+      contents: read
+      id-token: write
+      packages: write
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         manifest: ${{ fromJson(needs.images.outputs.manifests) }}
-    name: ${{ matrix.manifest.registry }}:${{ matrix.manifest.manifest_tag }} manifest
-    runs-on: ubuntu-latest
     env:
       MANIFEST: ${{ matrix.manifest.repo }}:${{ matrix.manifest.manifest_tag }}
+    name: ${{ matrix.manifest.registry }}:${{ matrix.manifest.manifest_tag }} manifest
     steps:
-      - name: Create manifest
-        run: |
-          for arch in 386 amd64 armv6 armv7 arm64 ppc64le; do
-            image="${{ matrix.manifest.repo }}:${arch}-${{ matrix.manifest.image_tag }}"
-            docker manifest create --amend "${MANIFEST}" "${image}" || true
-          done
       - name: Log in to Docker Hub
         if: matrix.manifest.registry == 'docker.io'
         uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
@@ -139,6 +166,30 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Push manifest
+      - name: Create and push manifest
         run: |
-          docker manifest push "${MANIFEST}"
+          images=()
+          for arch in 386 amd64 armv6 armv7 arm64 ppc64le; do
+            image="${{ matrix.manifest.repo }}:${arch}-${{ matrix.manifest.image_tag }}"
+            if docker buildx imagetools inspect "${image}" >/dev/null 2>&1; then
+              images+=("${image}")
+            else
+              echo "Skipping missing image: ${image}"
+            fi
+          done
+          if [ "${#images[@]}" -gt 0 ]; then
+            docker buildx imagetools create --tag "${MANIFEST}" "${images[@]}"
+          else
+            echo "No images found for manifest ${MANIFEST}, aborting..."
+            exit 1
+          fi
+      - name: Resolve manifest digest
+        id: manifest-digest
+        run: |
+          echo "digest=$(docker buildx imagetools inspect --format '{{json .Manifest.Digest}}' "${MANIFEST}" | jq -r)" >> "$GITHUB_OUTPUT"
+      - name: Attest manifest
+        uses: actions/attest-build-provenance@96278af6caaf10aea03fd8d33a09a777ca52d62f # v3
+        with:
+          push-to-registry: true
+          subject-digest: ${{ steps.manifest-digest.outputs.digest }}
+          subject-name: ${{ matrix.manifest.repo }}
