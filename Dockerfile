@@ -3,7 +3,7 @@ ARG BASE=build-base
 
 FROM ksmanis/stage3:20251229@sha256:d3f8cca07b54dcea960ac8b8863e24f32573c6f173b695060cca48667a399c22 AS build-base
 ARG CROSSDEV_TARGETS=
-RUN --mount=type=bind,from=ksmanis/gentoo-distcc:tcp,source=/var/cache/binpkgs,target=/cache \
+RUN --mount=type=bind,from=ksmanis/gentoo-distcc,source=/var/cache/binpkgs,target=/cache \
     --mount=type=bind,from=ksmanis/portage,source=/var/db/repos/gentoo,target=/var/db/repos/gentoo \
     set -eux; \
     cp -av /cache/. /var/cache/binpkgs; \
@@ -33,7 +33,7 @@ RUN --mount=type=bind,from=ksmanis/gentoo-distcc:tcp,source=/var/cache/binpkgs,t
     rm -rf /etc/portage/gnupg/
 
 FROM build-base AS build-ccache
-RUN --mount=type=bind,from=ksmanis/gentoo-distcc:tcp-ccache,source=/var/cache/binpkgs,target=/cache \
+RUN --mount=type=bind,from=ksmanis/gentoo-distcc:ccache,source=/var/cache/binpkgs,target=/cache \
     --mount=type=bind,from=ksmanis/portage,source=/var/db/repos/gentoo,target=/var/db/repos/gentoo \
     set -eux; \
     cp -av /cache/. /var/cache/binpkgs; \
