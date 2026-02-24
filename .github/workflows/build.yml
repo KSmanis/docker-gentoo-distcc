@@ -135,7 +135,7 @@ jobs:
           subject-name: ghcr.io/${{ env.DOCKERHUB_REPOSITORY }}
       - name: Prepare image results
         run: |
-          echo "${DOCKER_METADATA_OUTPUT_JSON}" | jq -cf images.jq > images.json
+          echo "${DOCKER_METADATA_OUTPUT_JSON}" | jq -c .tags > images.json
       - name: Upload image results
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         with:
@@ -144,7 +144,7 @@ jobs:
       - name: Prepare outputs
         id: output
         run: |
-          echo "manifests=$(echo "${DOCKER_METADATA_OUTPUT_JSON}" | jq -cf manifests.jq)" >> "$GITHUB_OUTPUT"
+          echo "manifests=$(./transform.py manifests)" >> "$GITHUB_OUTPUT"
   manifests:
     needs: images
     permissions:
@@ -161,6 +161,8 @@ jobs:
       MANIFEST: ${{ matrix.manifest.repo }}:${{ matrix.manifest.manifest_tag }}
     name: ${{ matrix.manifest.registry }}:${{ matrix.manifest.manifest_tag }} manifest
     steps:
+      - name: Check out repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - name: Log in to Docker Hub
         if: matrix.manifest.registry == 'docker.io'
         uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
@@ -181,13 +183,7 @@ jobs:
           pattern: images-*
       - name: Create and push manifest
         run: |
-          mapfile -t images < <(
-            jq -rs \
-              --arg image_tag '${{ matrix.manifest.image_tag }}' \
-              --arg repo '${{ matrix.manifest.repo }}' \
-              '[.[][] | select(.repo == $repo and .image_tag == $image_tag) | .image] | unique[]' \
-              images/*/images.json
-          )
+          readarray -t images < <(./transform.py images '${{ matrix.manifest.repo }}' '${{ matrix.manifest.image_tag }}' images/*/images.json)
           if [ "${#images[@]}" -gt 0 ]; then
             docker buildx imagetools create --tag "${MANIFEST}" "${images[@]}"
           else
