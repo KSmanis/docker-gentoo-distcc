@@ -60,7 +60,7 @@ jobs:
         uses: docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051 # v5
         with:
           images: |
-            docker.io/${{ env.DOCKERHUB_REPOSITORY }}
+            docker.io/${{ env.DOCKERHUB_REPOSITORY }},enable=${{ github.ref_name == github.event.repository.default_branch }}
             ghcr.io/${{ env.DOCKERHUB_REPOSITORY }}
           flavor: |
             latest=false
@@ -96,6 +96,7 @@ jobs:
             --exit-code-from ${{ matrix.manifest.test_target }}-client \
             ${{ matrix.manifest.test_target }}-client ${{ matrix.manifest.test_target }}-server
       - name: Log in to Docker Hub
+        if: github.ref_name == github.event.repository.default_branch
         uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
         with:
           username: ${{ env.DOCKERHUB_USERNAME }}
@@ -122,6 +123,7 @@ jobs:
           tags: ${{ steps.docker-metadata.outputs.tags }}
           target: distcc
       - name: Attest Docker Hub image
+        if: github.ref_name == github.event.repository.default_branch
         uses: actions/attest-build-provenance@a2bbfa25375fe432b6a289bc6b6cd05ecd0c4c32 # v4
         with:
           push-to-registry: true
