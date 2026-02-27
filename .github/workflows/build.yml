@@ -122,13 +122,13 @@ jobs:
           tags: ${{ steps.docker-metadata.outputs.tags }}
           target: distcc
       - name: Attest Docker Hub image
-        uses: actions/attest-build-provenance@e4d4f7c39adfa4c260fb5c147f0622000aa14b99 # v4
+        uses: actions/attest-build-provenance@a2bbfa25375fe432b6a289bc6b6cd05ecd0c4c32 # v4
         with:
           push-to-registry: true
           subject-digest: ${{ steps.push.outputs.digest }}
           subject-name: docker.io/${{ env.DOCKERHUB_REPOSITORY }}
       - name: Attest GitHub Container registry image
-        uses: actions/attest-build-provenance@e4d4f7c39adfa4c260fb5c147f0622000aa14b99 # v4
+        uses: actions/attest-build-provenance@a2bbfa25375fe432b6a289bc6b6cd05ecd0c4c32 # v4
         with:
           push-to-registry: true
           subject-digest: ${{ steps.push.outputs.digest }}
@@ -195,7 +195,7 @@ jobs:
         run: |
           echo "digest=$(docker buildx imagetools inspect --format '{{json .Manifest.Digest}}' "${MANIFEST}" | jq -r)" >> "$GITHUB_OUTPUT"
       - name: Attest manifest
-        uses: actions/attest-build-provenance@e4d4f7c39adfa4c260fb5c147f0622000aa14b99 # v4
+        uses: actions/attest-build-provenance@a2bbfa25375fe432b6a289bc6b6cd05ecd0c4c32 # v4
         with:
           push-to-registry: true
           subject-digest: ${{ steps.manifest-digest.outputs.digest }}
