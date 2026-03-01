@@ -77,8 +77,8 @@ jobs:
         id: cache
         with:
           path: cache-mount
-          key: cache-mount-${{ hashFiles('Dockerfile') }}
-          restore-keys: cache-mount-
+          key: cache-mount-${{ matrix.arch.id }}-${{ matrix.manifest.id }}-${{ hashFiles('Dockerfile') }}
+          restore-keys: cache-mount-${{ matrix.arch.id }}-${{ matrix.manifest.id }}-
       - name: Restore Docker cache mounts
         uses: reproducible-containers/buildkit-cache-dance@1b8ab18fbda5ad3646e3fcc9ed9dd41ce2f297b4 # v3.3.2
         with:
@@ -94,7 +94,6 @@ jobs:
                 "target": "/var/cache/binpkgs"
               }
             }
-          skip-extraction: ${{ steps.cache.outputs.cache-hit }}
       - name: Build image
         id: build
         uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
