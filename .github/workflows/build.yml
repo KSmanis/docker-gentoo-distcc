@@ -45,7 +45,7 @@ jobs:
         id: prep
         run: |
           {
-            echo "stage3_version=$(sed -n 's#^FROM ksmanis/stage3:\([^[:space:]@]\+\).*#\1#p' Dockerfile)"
+            echo "stage3_version=$(sed -n 's#^FROM ghcr.io/ksmanis/stage3:\([^[:space:]@]\+\).*#\1#p' Dockerfile)"
             echo "tag_arch=$(echo "${{ matrix.arch.id }}" | tr -d '/')"
           } >> "$GITHUB_OUTPUT"
       - name: Set up QEMU
