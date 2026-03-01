@@ -1,6 +1,6 @@
 [general]
 contrib=contrib-title-conventional-commits
-ignore=body-is-missing
+ignore=body-is-missing,body-min-length
 regex-style-search=true
 
 [body-max-line-length]

@@ -29,11 +29,21 @@ jobs:
             crossdev_targets: []
         manifest:
           - base: build-base
+            clang: ""
             id: latest
             test_target: distcc
           - base: build-ccache
+            clang: ""
             id: ccache
             test_target: distcc-ccache
+          - base: build-ccache
+            clang: "1"
+            id: ccache_clang
+            test_target: distcc-ccache-clang
+          - base: build-base
+            clang: "1"
+            id: clang
+            test_target: distcc-clang
     env:
       CROSSDEV_TARGETS: ${{ join(matrix.arch.crossdev_targets, ' ') }}
     name: ${{ matrix.arch.id }}:${{ matrix.manifest.id }} image
@@ -105,6 +115,7 @@ jobs:
         with:
           build-args: |
             BASE=${{ matrix.manifest.base }}
+            CLANG=${{ matrix.manifest.clang }}
             CROSSDEV_TARGETS=${{ env.CROSSDEV_TARGETS }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -142,6 +153,7 @@ jobs:
         with:
           build-args: |
             BASE=${{ matrix.manifest.base }}
+            CLANG=${{ matrix.manifest.clang }}
             CROSSDEV_TARGETS=${{ env.CROSSDEV_TARGETS }}
           cache-from: type=gha
           cache-to: type=gha,mode=max

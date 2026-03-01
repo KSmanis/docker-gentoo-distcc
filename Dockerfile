@@ -2,6 +2,7 @@
 ARG BASE=build-base
 
 FROM ghcr.io/ksmanis/stage3:20260301@sha256:8dde3818ae6be0b41ff188bf63d5858be63a52cb11aab71f3e4dad56c98f461c AS build-base
+ARG CLANG=
 ARG CROSSDEV_TARGETS=
 RUN --mount=type=bind,from=ghcr.io/ksmanis/portage,source=/var/db/repos/gentoo,target=/var/db/repos/gentoo \
     --mount=type=cache,id=base,target=/var/cache/binpkgs \
@@ -11,6 +12,11 @@ RUN --mount=type=bind,from=ghcr.io/ksmanis/portage,source=/var/db/repos/gentoo,t
     emerge --info; \
     emerge distcc; \
     distcc --version; \
+    if [ -n "${CLANG}" ]; then \
+        emerge llvm-core/clang; \
+        . /etc/profile.env; \
+        clang --version; \
+    fi; \
     if [ -n "${CROSSDEV_TARGETS}" ]; then \
         emerge crossdev; \
         crossdev --version; \

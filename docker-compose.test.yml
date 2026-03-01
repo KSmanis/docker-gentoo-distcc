@@ -43,5 +43,54 @@ services:
       - DISTCC_HOSTS=distcc-ccache-server
     volumes:
       - distcc-ccache:/var/cache/ccache
+  distcc-ccache-clang-server:
+    build:
+      args:
+        BASE: build-ccache
+        CLANG: "1"
+        CROSSDEV_TARGETS: ${CROSSDEV_TARGETS}
+      target: distcc
+    healthcheck:
+      start_interval: 1s
+      start_period: 30s
+    command: ["--enable-tcp-insecure", "--verbose"]
+    volumes:
+      - distcc-ccache-clang:/var/cache/ccache
+  distcc-ccache-clang-client:
+    depends_on:
+      distcc-ccache-clang-server:
+        condition: service_healthy
+    build:
+      args:
+        BASE: build-ccache
+        CLANG: "1"
+        CROSSDEV_TARGETS: ${CROSSDEV_TARGETS}
+      target: test
+    environment:
+      - DISTCC_HOSTS=distcc-ccache-clang-server
+    volumes:
+      - distcc-ccache-clang:/var/cache/ccache
+  distcc-clang-server:
+    build:
+      args:
+        CLANG: "1"
+        CROSSDEV_TARGETS: ${CROSSDEV_TARGETS}
+      target: distcc
+    healthcheck:
+      start_interval: 1s
+      start_period: 30s
+    command: ["--enable-tcp-insecure", "--verbose"]
+  distcc-clang-client:
+    depends_on:
+      distcc-clang-server:
+        condition: service_healthy
+    build:
+      args:
+        CLANG: "1"
+        CROSSDEV_TARGETS: ${CROSSDEV_TARGETS}
+      target: test
+    environment:
+      - DISTCC_HOSTS=distcc-clang-server
 volumes:
   distcc-ccache:
+  distcc-ccache-clang:
