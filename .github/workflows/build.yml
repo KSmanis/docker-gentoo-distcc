@@ -34,6 +34,8 @@ jobs:
           - base: build-ccache
             id: ccache
             test_target: distcc-ccache
+    env:
+      CROSSDEV_TARGETS: ${{ join(matrix.arch.crossdev_targets, ' ') }}
     name: ${{ matrix.arch.id }}:${{ matrix.manifest.id }} image
     runs-on: ${{ startsWith(matrix.arch.id, 'arm') && 'ubuntu-24.04-arm' || 'ubuntu-latest' }}
     outputs:
@@ -100,7 +102,7 @@ jobs:
         with:
           build-args: |
             BASE=${{ matrix.manifest.base }}
-            CROSSDEV_TARGETS=${{ join(matrix.arch.crossdev_targets, ' ') }}
+            CROSSDEV_TARGETS=${{ env.CROSSDEV_TARGETS }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           context: .
@@ -137,7 +139,7 @@ jobs:
         with:
           build-args: |
             BASE=${{ matrix.manifest.base }}
-            CROSSDEV_TARGETS=${{ join(matrix.arch.crossdev_targets, ' ') }}
+            CROSSDEV_TARGETS=${{ env.CROSSDEV_TARGETS }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           context: .

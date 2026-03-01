@@ -1,6 +1,8 @@
 services:
   distcc-server:
     build:
+      args:
+        CROSSDEV_TARGETS: ${CROSSDEV_TARGETS}
       target: distcc
     healthcheck:
       start_interval: 1s
@@ -11,6 +13,8 @@ services:
       distcc-server:
         condition: service_healthy
     build:
+      args:
+        CROSSDEV_TARGETS: ${CROSSDEV_TARGETS}
       target: test
     environment:
       - DISTCC_HOSTS=distcc-server
@@ -18,6 +22,7 @@ services:
     build:
       args:
         BASE: build-ccache
+        CROSSDEV_TARGETS: ${CROSSDEV_TARGETS}
       target: distcc
     healthcheck:
       start_interval: 1s
@@ -32,6 +37,7 @@ services:
     build:
       args:
         BASE: build-ccache
+        CROSSDEV_TARGETS: ${CROSSDEV_TARGETS}
       target: test
     environment:
       - DISTCC_HOSTS=distcc-ccache-server
