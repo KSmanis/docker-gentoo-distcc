@@ -1,10 +1,10 @@
 # syntax=docker/dockerfile:1.21.0@sha256:27f9262d43452075f3c410287a2c43f5ef1bf7ec2bb06e8c9eeb1b8d453087bc
 ARG BASE=build-base
 
-FROM ksmanis/stage3:20260223@sha256:26edb2ff5354a57f1804839cb3f650bf29828b6fe92f7f2d0a2593001d34e8dc AS build-base
+FROM ghcr.io/ksmanis/stage3:20260301@sha256:8c55e0169e318933ba4df894c40f007c08151380c448458e83a8b1866d0ad95b AS build-base
 ARG CROSSDEV_TARGETS=
-RUN --mount=type=bind,from=ksmanis/gentoo-distcc,source=/var/cache/binpkgs,target=/cache \
-    --mount=type=bind,from=ksmanis/portage,source=/var/db/repos/gentoo,target=/var/db/repos/gentoo \
+RUN --mount=type=bind,from=ghcr.io/ksmanis/gentoo-distcc,source=/var/cache/binpkgs,target=/cache \
+    --mount=type=bind,from=ghcr.io/ksmanis/portage,source=/var/db/repos/gentoo,target=/var/db/repos/gentoo \
     set -eux; \
     cp -av /cache/. /var/cache/binpkgs; \
     getuto; \
@@ -33,8 +33,8 @@ RUN --mount=type=bind,from=ksmanis/gentoo-distcc,source=/var/cache/binpkgs,targe
     rm -rf /etc/portage/gnupg/
 
 FROM build-base AS build-ccache
-RUN --mount=type=bind,from=ksmanis/gentoo-distcc:ccache,source=/var/cache/binpkgs,target=/cache \
-    --mount=type=bind,from=ksmanis/portage,source=/var/db/repos/gentoo,target=/var/db/repos/gentoo \
+RUN --mount=type=bind,from=ghcr.io/ksmanis/gentoo-distcc:ccache,source=/var/cache/binpkgs,target=/cache \
+    --mount=type=bind,from=ghcr.io/ksmanis/portage,source=/var/db/repos/gentoo,target=/var/db/repos/gentoo \
     set -eux; \
     cp -av /cache/. /var/cache/binpkgs; \
     getuto; \

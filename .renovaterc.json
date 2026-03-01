@@ -9,8 +9,8 @@
         "docker"
       ],
       "matchPackageNames": [
-        "ksmanis/gentoo-distcc",
-        "ksmanis/portage"
+        "ghcr.io/ksmanis/gentoo-distcc",
+        "ghcr.io/ksmanis/portage"
       ],
       "pinDigests": false
     },
@@ -20,7 +20,7 @@
         "docker"
       ],
       "matchPackageNames": [
-        "ksmanis/stage3"
+        "ghcr.io/ksmanis/stage3"
       ],
       "versioning": "regex:^(?<patch>\\d{8})$"
     }
