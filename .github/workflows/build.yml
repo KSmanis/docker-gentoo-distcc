@@ -79,8 +79,11 @@ jobs:
         id: cache
         with:
           path: cache-mount
-          key: cache-mount-${{ matrix.arch.id }}-${{ matrix.manifest.id }}-${{ hashFiles('Dockerfile') }}
-          restore-keys: cache-mount-${{ matrix.arch.id }}-${{ matrix.manifest.id }}-
+          key: cache-mount-${{ matrix.arch.id }}-${{ matrix.manifest.id }}-${{ hashFiles('Dockerfile') }}-${{ github.sha }}
+          restore-keys: |
+            cache-mount-${{ matrix.arch.id }}-${{ matrix.manifest.id }}-${{ hashFiles('Dockerfile') }}-
+            cache-mount-${{ matrix.arch.id }}-${{ matrix.manifest.id }}-
+            cache-mount-${{ matrix.arch.id }}-
       - name: Restore Docker cache mounts
         uses: reproducible-containers/buildkit-cache-dance@1b8ab18fbda5ad3646e3fcc9ed9dd41ce2f297b4 # v3.3.2
         with:
