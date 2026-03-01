@@ -72,6 +72,29 @@ jobs:
             type=ref,event=pr,prefix=${{ steps.prep.outputs.tag_arch }}-pr-,suffix=-${{ matrix.manifest.id }}
             type=raw,value=${{ steps.prep.outputs.tag_arch }}-${{ steps.prep.outputs.stage3_version }}-${{ matrix.manifest.id }},enable={{is_default_branch}}
             type=raw,value=${{ steps.prep.outputs.tag_arch }}-${{ matrix.manifest.id }},enable={{is_default_branch}}
+      - name: Cache Docker mounts
+        uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5
+        id: cache
+        with:
+          path: cache-mount
+          key: cache-mount-${{ hashFiles('Dockerfile') }}
+          restore-keys: cache-mount-
+      - name: Restore Docker cache mounts
+        uses: reproducible-containers/buildkit-cache-dance@1b8ab18fbda5ad3646e3fcc9ed9dd41ce2f297b4 # v3.3.2
+        with:
+          cache-dir: cache-mount
+          cache-map: |
+            {
+              "cache-mount/base": {
+                "id": "base",
+                "target": "/var/cache/binpkgs"
+              },
+              "cache-mount/ccache": {
+                "id": "ccache",
+                "target": "/var/cache/binpkgs"
+              }
+            }
+          skip-extraction: ${{ steps.cache.outputs.cache-hit }}
       - name: Build image
         id: build
         uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
@@ -79,6 +102,8 @@ jobs:
           build-args: |
             BASE=${{ matrix.manifest.base }}
             CROSSDEV_TARGETS=${{ join(matrix.arch.crossdev_targets, ' ') }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           context: .
           labels: ${{ steps.docker-metadata.outputs.labels }}
           load: true
@@ -114,6 +139,8 @@ jobs:
           build-args: |
             BASE=${{ matrix.manifest.base }}
             CROSSDEV_TARGETS=${{ join(matrix.arch.crossdev_targets, ' ') }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           context: .
           labels: ${{ steps.docker-metadata.outputs.labels }}
           platforms: linux/${{ matrix.arch.id }}

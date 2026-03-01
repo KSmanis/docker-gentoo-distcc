@@ -3,10 +3,9 @@ ARG BASE=build-base
 
 FROM ghcr.io/ksmanis/stage3:20260301@sha256:8c55e0169e318933ba4df894c40f007c08151380c448458e83a8b1866d0ad95b AS build-base
 ARG CROSSDEV_TARGETS=
-RUN --mount=type=bind,from=ghcr.io/ksmanis/gentoo-distcc,source=/var/cache/binpkgs,target=/cache \
-    --mount=type=bind,from=ghcr.io/ksmanis/portage,source=/var/db/repos/gentoo,target=/var/db/repos/gentoo \
+RUN --mount=type=bind,from=ghcr.io/ksmanis/portage,source=/var/db/repos/gentoo,target=/var/db/repos/gentoo \
+    --mount=type=cache,id=base,target=/var/cache/binpkgs \
     set -eux; \
-    cp -av /cache/. /var/cache/binpkgs; \
     getuto; \
     export EMERGE_DEFAULT_OPTS="--buildpkg --color=y --getbinpkg --quiet-build --tree --verbose"; \
     emerge --info; \
@@ -33,10 +32,9 @@ RUN --mount=type=bind,from=ghcr.io/ksmanis/gentoo-distcc,source=/var/cache/binpk
     rm -rf /etc/portage/gnupg/
 
 FROM build-base AS build-ccache
-RUN --mount=type=bind,from=ghcr.io/ksmanis/gentoo-distcc:ccache,source=/var/cache/binpkgs,target=/cache \
-    --mount=type=bind,from=ghcr.io/ksmanis/portage,source=/var/db/repos/gentoo,target=/var/db/repos/gentoo \
+RUN --mount=type=bind,from=ghcr.io/ksmanis/portage,source=/var/db/repos/gentoo,target=/var/db/repos/gentoo \
+    --mount=type=cache,id=ccache,target=/var/cache/binpkgs \
     set -eux; \
-    cp -av /cache/. /var/cache/binpkgs; \
     getuto; \
     export EMERGE_DEFAULT_OPTS="--buildpkg --color=y --getbinpkg --quiet-build --tree --verbose"; \
     emerge --info; \
