@@ -7,7 +7,7 @@ RUN --mount=type=bind,from=ghcr.io/ksmanis/portage,source=/var/db/repos/gentoo,t
     --mount=type=cache,id=base,target=/var/cache/binpkgs \
     set -eux; \
     getuto; \
-    export EMERGE_DEFAULT_OPTS="--buildpkg --color=y --getbinpkg --quiet-build --tree --verbose"; \
+    export EMERGE_DEFAULT_OPTS="--buildpkg --color=y --getbinpkg --jobs --quiet-build --tree --verbose"; \
     emerge --info; \
     emerge distcc; \
     distcc --version; \
@@ -36,7 +36,7 @@ RUN --mount=type=bind,from=ghcr.io/ksmanis/portage,source=/var/db/repos/gentoo,t
     --mount=type=cache,id=ccache,target=/var/cache/binpkgs \
     set -eux; \
     getuto; \
-    export EMERGE_DEFAULT_OPTS="--buildpkg --color=y --getbinpkg --quiet-build --tree --verbose"; \
+    export EMERGE_DEFAULT_OPTS="--buildpkg --color=y --getbinpkg --jobs --quiet-build --tree --verbose"; \
     emerge --info; \
     emerge ccache; \
     ccache --version; \
