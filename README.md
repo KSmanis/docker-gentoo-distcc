@@ -19,6 +19,7 @@ Ubuntu or Windows box idling around. Docker is the only prerequisite.
   - `ppc64`
   - `x86`
 - Server-side caching using [ccache](#ccache)
+- Opt-in [Clang](#clang) toolchain
 - Cross-compilation support using [crossdev](#crossdev)
 
 > [!NOTE]
@@ -71,6 +72,23 @@ Ccache statistics can be queried as follows:
 
 ```shell
 docker exec gentoo-distcc-ccache ccache -sv
+```
+
+### Clang
+
+For projects that require the Clang compiler, dedicated image variants are
+available. These variants include both the GCC and Clang compilers.
+
+To use the Clang variant:
+
+```shell
+docker run -d -p 3632:3632 --name gentoo-distcc-clang --rm ksmanis/gentoo-distcc:clang
+```
+
+To use the Clang variant with ccache:
+
+```shell
+docker run -d -p 3632:3632 --name gentoo-distcc-ccache-clang --rm ksmanis/gentoo-distcc:ccache_clang
 ```
 
 ## Crossdev

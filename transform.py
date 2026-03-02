@@ -33,7 +33,7 @@ def _transform_images(repo: str, image_tag: str, *image_paths: str) -> None:
 def _transform_manifests():
     manifests = []
     for image in os.environ["DOCKER_METADATA_OUTPUT_TAGS"].splitlines():
-        for manifest_id in ("latest", "ccache"):
+        for manifest_id in ("latest", "ccache", "ccache_clang", "clang"):
             image_tag = _image_tag_without_arch(image)
             split_image_tag = image_tag.split("-")
             split_image_tag[-1] = manifest_id
