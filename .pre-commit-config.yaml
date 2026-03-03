@@ -70,7 +70,7 @@ repos:
         args: ["--number", "--wrap=80"]
         priority: *write-parallel
   - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.47.0
+    rev: v0.48.0
     hooks:
       - id: markdownlint
         priority: *read-only
