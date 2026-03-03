@@ -1,6 +1,7 @@
 name: build
 on: [pull_request, push, workflow_dispatch]
 env:
+  DOCKER_CACHE_REPOSITORY: ghcr.io/ksmanis/gentoo-distcc-cache
   DOCKERHUB_REPOSITORY: ksmanis/gentoo-distcc
   DOCKERHUB_USERNAME: ksmanis
 jobs:
@@ -119,6 +120,18 @@ jobs:
                 "target": "/var/cache/binpkgs"
               }
             }
+      - name: Log in to Docker Hub
+        if: github.ref_name == github.event.repository.default_branch
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
+        with:
+          username: ${{ env.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Log in to GitHub Container registry
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build image
         id: build
         uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
@@ -127,8 +140,10 @@ jobs:
             BASE=${{ matrix.manifest.base }}
             CLANG=${{ matrix.manifest.clang }}
             CROSSDEV_TARGETS=${{ env.CROSSDEV_TARGETS }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: |
+            type=registry,ref=${{ env.DOCKER_CACHE_REPOSITORY }}:${{ steps.docker-metadata.outputs.version }}
+            type=registry,ref=${{ env.DOCKER_CACHE_REPOSITORY }}:${{ steps.prep.outputs.tag_arch }}-branch-${{ github.event.repository.default_branch }}-${{ matrix.manifest.id }}
+          cache-to: type=registry,ref=${{ env.DOCKER_CACHE_REPOSITORY }}:${{ steps.docker-metadata.outputs.version }},ignore-error=true,mode=max
           context: .
           labels: ${{ steps.docker-metadata.outputs.labels }}
           load: true
@@ -145,18 +160,6 @@ jobs:
           docker compose -f docker-compose.test.yml -p test up \
             --exit-code-from ${{ matrix.manifest.test_target }}-client \
             ${{ matrix.manifest.test_target }}-client ${{ matrix.manifest.test_target }}-server
-      - name: Log in to Docker Hub
-        if: github.ref_name == github.event.repository.default_branch
-        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
-        with:
-          username: ${{ env.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Log in to GitHub Container registry
-        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
       - name: Push image
         id: push
         uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
@@ -165,8 +168,10 @@ jobs:
             BASE=${{ matrix.manifest.base }}
             CLANG=${{ matrix.manifest.clang }}
             CROSSDEV_TARGETS=${{ env.CROSSDEV_TARGETS }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: |
+            type=registry,ref=${{ env.DOCKER_CACHE_REPOSITORY }}:${{ steps.docker-metadata.outputs.version }}
+            type=registry,ref=${{ env.DOCKER_CACHE_REPOSITORY }}:${{ steps.prep.outputs.tag_arch }}-branch-${{ github.event.repository.default_branch }}-${{ matrix.manifest.id }}
+          cache-to: type=registry,ref=${{ env.DOCKER_CACHE_REPOSITORY }}:${{ steps.docker-metadata.outputs.version }},ignore-error=true,mode=max
           context: .
           labels: ${{ steps.docker-metadata.outputs.labels }}
           platforms: linux/${{ matrix.arch.id }}
