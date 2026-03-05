@@ -223,12 +223,11 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
-      - name: Log in to Docker Hub
-        if: matrix.manifest.registry == 'docker.io'
-        uses: docker/login-action@b45d80f862d83dbcd57f89517bcf500b2ab88fb2 # v4
+      - name: Download image results
+        uses: actions/download-artifact@70fc10c6e5e1ce46ad2ea6f2b72d43f7d47b13c3 # v8
         with:
-          username: ${{ env.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          path: images
+          pattern: images-*
       - name: Log in to GitHub Container registry
         if: matrix.manifest.registry == 'ghcr.io'
         uses: docker/login-action@b45d80f862d83dbcd57f89517bcf500b2ab88fb2 # v4
@@ -236,20 +235,29 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Download image results
-        uses: actions/download-artifact@70fc10c6e5e1ce46ad2ea6f2b72d43f7d47b13c3 # v8
-        with:
-          path: images
-          pattern: images-*
-      - name: Create and push manifest
+      - name: Fetch descriptors
         run: |
           readarray -t images < <(./transform.py images '${{ matrix.manifest.repo }}' '${{ matrix.manifest.image_tag }}' images/*/images.json)
-          if [ "${#images[@]}" -gt 0 ]; then
-            docker buildx imagetools create --tag "${MANIFEST}" "${images[@]}"
-          else
+          if [ "${#images[@]}" -eq 0 ]; then
             echo "No images found for manifest ${MANIFEST}, aborting..."
             exit 1
           fi
+
+          i=0
+          for image in "${images[@]}"; do
+            docker buildx imagetools inspect --raw "${image}" | jq -c '.manifests[] | select(.platform.architecture != "unknown")' > "descriptor-${i}.json"
+            i=$((i + 1))
+          done
+      - name: Log in to Docker Hub
+        if: matrix.manifest.registry == 'docker.io'
+        uses: docker/login-action@b45d80f862d83dbcd57f89517bcf500b2ab88fb2 # v4
+        with:
+          username: ${{ env.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Create and push manifest
+        run: |
+          descriptors=(descriptor-*.json)
+          docker buildx imagetools create "${descriptors[@]/#/--file=}" --tag="${MANIFEST}"
       - name: Resolve manifest digest
         id: manifest-digest
         run: |
