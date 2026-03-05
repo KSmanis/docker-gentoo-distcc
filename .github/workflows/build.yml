@@ -95,9 +95,9 @@ jobs:
             type=ref,event=pr,prefix=${{ steps.prep.outputs.tag_arch }}-pr-,suffix=-${{ matrix.manifest.id }}
             type=raw,value=${{ steps.prep.outputs.tag_arch }}-${{ steps.prep.outputs.stage3_version }}-${{ matrix.manifest.id }},enable={{is_default_branch}}
             type=raw,value=${{ steps.prep.outputs.tag_arch }}-${{ matrix.manifest.id }},enable={{is_default_branch}}
-      - name: Cache Docker mounts
-        uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5
-        id: cache
+      - name: Restore Docker mounts cache
+        uses: actions/cache/restore@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5
+        id: cache-restore
         with:
           path: cache-mount
           key: cache-mount-${{ matrix.arch.id }}-${{ matrix.manifest.id }}-${{ hashFiles('Dockerfile') }}-${{ github.sha }}
@@ -105,7 +105,7 @@ jobs:
             cache-mount-${{ matrix.arch.id }}-${{ matrix.manifest.id }}-${{ hashFiles('Dockerfile') }}-
             cache-mount-${{ matrix.arch.id }}-${{ matrix.manifest.id }}-
             cache-mount-${{ matrix.arch.id }}-
-      - name: Restore Docker cache mounts
+      - name: Inject Docker mounts cache
         uses: reproducible-containers/buildkit-cache-dance@1b8ab18fbda5ad3646e3fcc9ed9dd41ce2f297b4 # v3.3.2
         with:
           cache-dir: cache-mount
@@ -180,6 +180,12 @@ jobs:
           sbom: true
           tags: ${{ steps.docker-metadata.outputs.tags }}
           target: distcc
+      - name: Save Docker mounts cache
+        if: ${{ !startsWith(github.ref_name, 'renovate/') }}
+        uses: actions/cache/save@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5
+        with:
+          path: cache-mount
+          key: ${{ steps.cache-restore.outputs.cache-primary-key }}
       - name: Attest Docker Hub image
         if: github.ref_name == github.event.repository.default_branch
         uses: actions/attest-build-provenance@a2bbfa25375fe432b6a289bc6b6cd05ecd0c4c32 # v4
