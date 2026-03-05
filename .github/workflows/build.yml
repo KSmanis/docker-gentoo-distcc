@@ -180,7 +180,7 @@ jobs:
           tags: ${{ steps.docker-metadata.outputs.tags }}
           target: distcc
       - name: Extract Docker mounts cache
-        if: ${{ !startsWith(github.ref_name, 'renovate/') }}
+        if: github.ref_name == github.event.repository.default_branch
         run: |
           node buildkit-cache-dance/dist/index.js \
             --extract \
@@ -188,7 +188,7 @@ jobs:
             --cache-dir cache-mount \
             --cache-map '{"cache-mount/base":{"id":"base","target":"/var/cache/binpkgs"},"cache-mount/ccache":{"id":"ccache","target":"/var/cache/binpkgs"}}'
       - name: Save Docker mounts cache
-        if: ${{ !startsWith(github.ref_name, 'renovate/') }}
+        if: github.ref_name == github.event.repository.default_branch
         uses: actions/cache/save@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5
         with:
           path: cache-mount
