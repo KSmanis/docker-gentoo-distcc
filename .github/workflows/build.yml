@@ -77,6 +77,7 @@ jobs:
         with:
           platforms: ${{ matrix.arch.id }}
       - name: Set up buildx
+        id: setup-buildx
         uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
       - name: Define Docker metadata
         id: docker-metadata
@@ -95,6 +96,13 @@ jobs:
             type=ref,event=pr,prefix=${{ steps.prep.outputs.tag_arch }}-pr-,suffix=-${{ matrix.manifest.id }}
             type=raw,value=${{ steps.prep.outputs.tag_arch }}-${{ steps.prep.outputs.stage3_version }}-${{ matrix.manifest.id }},enable={{is_default_branch}}
             type=raw,value=${{ steps.prep.outputs.tag_arch }}-${{ matrix.manifest.id }},enable={{is_default_branch}}
+      - name: Set up buildkit-cache-dance
+        env:
+          # renovate: datasource=github-releases depName=reproducible-containers/buildkit-cache-dance
+          BUILDKIT_CACHE_DANCE_VERSION: v3.3.2
+        run: |
+          mkdir -p buildkit-cache-dance
+          curl -fsSL "https://github.com/reproducible-containers/buildkit-cache-dance/archive/refs/tags/${BUILDKIT_CACHE_DANCE_VERSION}.tar.gz" | tar --strip-components=1 -C buildkit-cache-dance -xz
       - name: Restore Docker mounts cache
         uses: actions/cache/restore@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5
         id: cache-restore
@@ -106,20 +114,11 @@ jobs:
             cache-mount-${{ matrix.arch.id }}-${{ matrix.manifest.id }}-
             cache-mount-${{ matrix.arch.id }}-
       - name: Inject Docker mounts cache
-        uses: reproducible-containers/buildkit-cache-dance@1b8ab18fbda5ad3646e3fcc9ed9dd41ce2f297b4 # v3.3.2
-        with:
-          cache-dir: cache-mount
-          cache-map: |
-            {
-              "cache-mount/base": {
-                "id": "base",
-                "target": "/var/cache/binpkgs"
-              },
-              "cache-mount/ccache": {
-                "id": "ccache",
-                "target": "/var/cache/binpkgs"
-              }
-            }
+        run: |
+          node buildkit-cache-dance/dist/index.js \
+            --builder "${{ steps.setup-buildx.outputs.name }}" \
+            --cache-dir cache-mount \
+            --cache-map '{"cache-mount/base":{"id":"base","target":"/var/cache/binpkgs"},"cache-mount/ccache":{"id":"ccache","target":"/var/cache/binpkgs"}}'
       - name: Log in to Docker Hub
         if: github.ref_name == github.event.repository.default_branch
         uses: docker/login-action@b45d80f862d83dbcd57f89517bcf500b2ab88fb2 # v4
@@ -180,6 +179,14 @@ jobs:
           sbom: true
           tags: ${{ steps.docker-metadata.outputs.tags }}
           target: distcc
+      - name: Extract Docker mounts cache
+        if: ${{ !startsWith(github.ref_name, 'renovate/') }}
+        run: |
+          node buildkit-cache-dance/dist/index.js \
+            --extract \
+            --builder "${{ steps.setup-buildx.outputs.name }}" \
+            --cache-dir cache-mount \
+            --cache-map '{"cache-mount/base":{"id":"base","target":"/var/cache/binpkgs"},"cache-mount/ccache":{"id":"ccache","target":"/var/cache/binpkgs"}}'
       - name: Save Docker mounts cache
         if: ${{ !startsWith(github.ref_name, 'renovate/') }}
         uses: actions/cache/save@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5
