@@ -34,7 +34,7 @@ repos:
       - id: hadolint-docker
         priority: *read-only
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.37.0
+    rev: 0.37.1
     hooks:
       - id: check-compose-spec
         priority: *read-only
