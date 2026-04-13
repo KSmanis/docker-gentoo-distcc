@@ -104,7 +104,7 @@ jobs:
           mkdir -p buildkit-cache-dance
           curl -fsSL "https://github.com/reproducible-containers/buildkit-cache-dance/archive/refs/tags/${BUILDKIT_CACHE_DANCE_VERSION}.tar.gz" | tar --strip-components=1 -C buildkit-cache-dance -xz
       - name: Restore Docker mounts cache
-        uses: actions/cache/restore@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5
+        uses: actions/cache/restore@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5
         id: cache-restore
         with:
           path: cache-mount
@@ -189,7 +189,7 @@ jobs:
             --cache-map '{"cache-mount/base":{"id":"base","target":"/var/cache/binpkgs"},"cache-mount/ccache":{"id":"ccache","target":"/var/cache/binpkgs"}}'
       - name: Save Docker mounts cache
         if: github.ref_name == github.event.repository.default_branch
-        uses: actions/cache/save@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5
+        uses: actions/cache/save@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5
         with:
           path: cache-mount
           key: ${{ steps.cache-restore.outputs.cache-primary-key }}
