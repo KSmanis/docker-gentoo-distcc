@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1.23.0@sha256:2780b5c3bab67f1f76c781860de469442999ed1a0d7992a5efdf2cffc0e3d769
 ARG BASE=build-base
 
-FROM ghcr.io/ksmanis/stage3:20260406@sha256:2be01f0fa52556577b83b05ac64230f5b21b5fe86888ff4886fcce4f34d2ca80 AS build-base
+FROM ghcr.io/ksmanis/stage3:20260413@sha256:c656cfcf196954d9ba3d3edb8fbc2668f861eb1db88b8ae2c8af8d4d844508d5 AS build-base
 ARG CLANG=
 ARG CROSSDEV_TARGETS=
 RUN --mount=type=bind,from=ghcr.io/ksmanis/portage,source=/var/db/repos/gentoo,target=/var/db/repos/gentoo \
