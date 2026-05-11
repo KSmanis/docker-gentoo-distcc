@@ -99,7 +99,7 @@ jobs:
       - name: Set up buildkit-cache-dance
         env:
           # renovate: datasource=github-releases depName=reproducible-containers/buildkit-cache-dance
-          BUILDKIT_CACHE_DANCE_VERSION: v3.3.2
+          BUILDKIT_CACHE_DANCE_VERSION: v3.4.0
         run: |
           mkdir -p buildkit-cache-dance
           curl -fsSL "https://github.com/reproducible-containers/buildkit-cache-dance/archive/refs/tags/${BUILDKIT_CACHE_DANCE_VERSION}.tar.gz" | tar --strip-components=1 -C buildkit-cache-dance -xz
