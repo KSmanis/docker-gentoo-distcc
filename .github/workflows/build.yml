@@ -195,13 +195,13 @@ jobs:
           key: ${{ steps.cache-restore.outputs.cache-primary-key }}
       - name: Attest Docker Hub image
         if: github.ref_name == github.event.repository.default_branch
-        uses: actions/attest-build-provenance@a2bbfa25375fe432b6a289bc6b6cd05ecd0c4c32 # v4
+        uses: actions/attest-build-provenance@0f67c3f4856b2e3261c31976d6725780e5e4c373 # v4
         with:
           push-to-registry: true
           subject-digest: ${{ steps.push.outputs.digest }}
           subject-name: docker.io/${{ env.DOCKERHUB_REPOSITORY }}
       - name: Attest GitHub Container registry image
-        uses: actions/attest-build-provenance@a2bbfa25375fe432b6a289bc6b6cd05ecd0c4c32 # v4
+        uses: actions/attest-build-provenance@0f67c3f4856b2e3261c31976d6725780e5e4c373 # v4
         with:
           push-to-registry: true
           subject-digest: ${{ steps.push.outputs.digest }}
@@ -276,7 +276,7 @@ jobs:
         run: |
           echo "digest=$(docker buildx imagetools inspect --format '{{json .Manifest.Digest}}' "${MANIFEST}" | jq -r)" >> "$GITHUB_OUTPUT"
       - name: Attest manifest
-        uses: actions/attest-build-provenance@a2bbfa25375fe432b6a289bc6b6cd05ecd0c4c32 # v4
+        uses: actions/attest-build-provenance@0f67c3f4856b2e3261c31976d6725780e5e4c373 # v4
         with:
           push-to-registry: true
           subject-digest: ${{ steps.manifest-digest.outputs.digest }}
