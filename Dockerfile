@@ -4,6 +4,7 @@ ARG BASE=build-base
 FROM ghcr.io/ksmanis/stage3:20260622@sha256:903df2c5007318be4a1ec29d320db3ff5ad9eebf3644773d0e889fea1472fb62 AS build-base
 ARG CLANG=
 ARG CROSSDEV_TARGETS=
+ARG TARGETPLATFORM
 RUN --mount=type=bind,from=ghcr.io/ksmanis/portage,source=/var/db/repos/gentoo,target=/var/db/repos/gentoo \
     --mount=type=cache,id=base,target=/var/cache/binpkgs \
     set -eux; \
@@ -13,6 +14,9 @@ RUN --mount=type=bind,from=ghcr.io/ksmanis/portage,source=/var/db/repos/gentoo,t
     emerge distcc; \
     distcc --version; \
     if [ -n "${CLANG}" ]; then \
+        case "${TARGETPLATFORM}" in \
+            "linux/arm/v6") export LDFLAGS=-latomic ;; \
+        esac; \
         emerge llvm-core/clang; \
         . /etc/profile.env; \
         clang --version; \
