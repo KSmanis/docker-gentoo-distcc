@@ -100,13 +100,16 @@ COPY docker-healthcheck.sh /usr/local/bin/docker-healthcheck.sh
 ENTRYPOINT ["tini", "-e", "143", "--", "docker-entrypoint.sh"]
 EXPOSE 3632
 HEALTHCHECK CMD ["docker-healthcheck.sh"]
+# hadolint ignore=DL3066
 USER distcc
 
 # hadolint ignore=DL3006
 FROM $BASE AS test
+# hadolint ignore=DL3064
 ARG TEST_USERNAME=notroot
 RUN useradd -G distcc ${TEST_USERNAME}
 WORKDIR /home/${TEST_USERNAME}/
+# hadolint ignore=DL3066
 USER ${TEST_USERNAME}
 COPY --chown=${TEST_USERNAME} tests/test.c ./
 COPY --chown=${TEST_USERNAME} tests/test.sh ./
