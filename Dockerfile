@@ -81,15 +81,15 @@ RUN set -eux; \
         "linux/ppc64le") TINI_ARCH="ppc64le" ;; \
         *) echo "Error: Unsupported TARGETPLATFORM '$TARGETPLATFORM'" >&2; exit 1 ;; \
     esac; \
-    wget -nv "https://github.com/krallin/tini/releases/download/v${TINI_VERSION}/tini-${TINI_ARCH}" -O /usr/local/bin/tini; \
-    wget -nv "https://github.com/krallin/tini/releases/download/v${TINI_VERSION}/tini-${TINI_ARCH}.asc" -O /usr/local/bin/tini.asc; \
-    wget -nv "https://github.com/krallin/tini/releases/download/v${TINI_VERSION}/tini-${TINI_ARCH}.sha256sum" -O /usr/local/bin/tini.sha256sum; \
+    wget -nv "https://github.com/krallin/tini/releases/download/v${TINI_VERSION}/tini-static-${TINI_ARCH}" -O /usr/local/bin/tini; \
+    wget -nv "https://github.com/krallin/tini/releases/download/v${TINI_VERSION}/tini-static-${TINI_ARCH}.asc" -O /usr/local/bin/tini.asc; \
+    wget -nv "https://github.com/krallin/tini/releases/download/v${TINI_VERSION}/tini-static-${TINI_ARCH}.sha256sum" -O /usr/local/bin/tini.sha256sum; \
     GNUPGHOME="$(mktemp -d)"; \
     export GNUPGHOME; \
     gpg --batch --keyserver keyserver.ubuntu.com --recv-keys "${TINI_GPGKEY}"; \
     gpg --batch --verify /usr/local/bin/tini.asc /usr/local/bin/tini; \
     gpgconf --kill all; \
-    sed -i "s#tini-${TINI_ARCH}#/usr/local/bin/tini#" /usr/local/bin/tini.sha256sum; \
+    sed -i "s#tini-static-${TINI_ARCH}#/usr/local/bin/tini#" /usr/local/bin/tini.sha256sum; \
     sha256sum --check --strict /usr/local/bin/tini.sha256sum; \
     rm -rf "${GNUPGHOME}" /usr/local/bin/tini.asc /usr/local/bin/tini.sha256sum; \
     chmod +x /usr/local/bin/tini; \
