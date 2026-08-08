@@ -48,7 +48,7 @@ RUN --mount=type=bind,from=ghcr.io/ksmanis/portage,source=/var/db/repos/gentoo,t
     getuto; \
     export EMERGE_DEFAULT_OPTS="--buildpkg --color=y --getbinpkg --jobs --quiet-build --tree --verbose"; \
     emerge --info; \
-    emerge ccache; \
+    USE="redis http" emerge ccache; \
     ccache --version; \
     emerge --oneshot gentoolkit; \
     eclean packages; \
