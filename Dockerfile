@@ -48,6 +48,8 @@ RUN --mount=type=bind,from=ghcr.io/ksmanis/portage,source=/var/db/repos/gentoo,t
     getuto; \
     export EMERGE_DEFAULT_OPTS="--buildpkg --color=y --getbinpkg --jobs --quiet-build --tree --verbose"; \
     emerge --info; \
+    mkdir -p /etc/portage/package.use; \
+    echo 'dev-util/ccache http redis' > /etc/portage/package.use/ccache; \
     emerge ccache; \
     ccache --version; \
     emerge --oneshot gentoolkit; \
