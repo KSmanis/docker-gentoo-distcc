@@ -160,6 +160,7 @@ jobs:
             --exit-code-from ${{ matrix.manifest.test_target }}-client \
             ${{ matrix.manifest.test_target }}-client ${{ matrix.manifest.test_target }}-server
       - name: Push image
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
         id: push
         uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7
         with:
@@ -201,6 +202,7 @@ jobs:
           subject-digest: ${{ steps.push.outputs.digest }}
           subject-name: docker.io/${{ env.DOCKERHUB_REPOSITORY }}
       - name: Attest GitHub Container registry image
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
         uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4
         with:
           push-to-registry: true
@@ -220,6 +222,7 @@ jobs:
           echo "manifests=$(./transform.py manifests)" >> "$GITHUB_OUTPUT"
   manifests:
     needs: images
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     permissions:
       attestations: write
       contents: read
