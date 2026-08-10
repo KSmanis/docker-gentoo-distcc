@@ -15,7 +15,7 @@ RUN --mount=type=bind,from=ghcr.io/ksmanis/portage,source=/var/db/repos/gentoo,t
     distcc --version; \
     if [ -n "${CLANG}" ]; then \
         case "${TARGETPLATFORM}" in \
-            "linux/arm/v6") export LDFLAGS=-latomic ;; \
+            "linux/arm/v6" | "linux/arm/v7") export LDFLAGS=-latomic ;; \
         esac; \
         emerge llvm-core/clang; \
         . /etc/profile.env; \
