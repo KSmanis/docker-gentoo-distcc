@@ -9,7 +9,7 @@ jobs:
     continue-on-error: true
     permissions:
       attestations: write
-      contents: read
+      contents: write
       id-token: write
       packages: write
     strategy:
@@ -137,6 +137,9 @@ jobs:
         with:
           build-args: |
             BASE=${{ matrix.manifest.base }}
+            BINREPO_BRANCH=binrepo-${{ steps.prep.outputs.tag_arch }}-${{ matrix.manifest.id }}
+            BINREPO_PUBLISH=${{ github.event_name == 'push' && '1' || '' }}
+            BINREPO_REPOSITORY=${{ github.repository }}
             CLANG=${{ matrix.manifest.clang }}
             CROSSDEV_TARGETS=${{ env.CROSSDEV_TARGETS }}
           cache-from: |
@@ -147,6 +150,7 @@ jobs:
           labels: ${{ steps.docker-metadata.outputs.labels }}
           load: true
           platforms: linux/${{ matrix.arch.id }}
+          secrets: gh_token=${{ secrets.GITHUB_TOKEN }}
           tags: ${{ steps.docker-metadata.outputs.tags }}
           target: distcc
       - name: Inspect image
@@ -166,6 +170,9 @@ jobs:
         with:
           build-args: |
             BASE=${{ matrix.manifest.base }}
+            BINREPO_BRANCH=binrepo-${{ steps.prep.outputs.tag_arch }}-${{ matrix.manifest.id }}
+            BINREPO_PUBLISH=${{ github.event_name == 'push' && '1' || '' }}
+            BINREPO_REPOSITORY=${{ github.repository }}
             CLANG=${{ matrix.manifest.clang }}
             CROSSDEV_TARGETS=${{ env.CROSSDEV_TARGETS }}
           cache-from: |
@@ -178,6 +185,7 @@ jobs:
           provenance: mode=max
           push: true
           sbom: true
+          secrets: gh_token=${{ secrets.GITHUB_TOKEN }}
           tags: ${{ steps.docker-metadata.outputs.tags }}
           target: distcc
       - name: Extract Docker mounts cache

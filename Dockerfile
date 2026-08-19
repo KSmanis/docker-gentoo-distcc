@@ -1,12 +1,19 @@
 # syntax=docker/dockerfile:1.26.0@sha256:ecfaec9ed6d810b56388c508f4121597bfbba70d41a6dfeee4d8cad5f295fc32
 ARG BASE=build-base
+ARG BINREPO_BRANCH=
+ARG BINREPO_PUBLISH=
+ARG BINREPO_REPOSITORY=
 
 FROM ghcr.io/ksmanis/stage3:20260817@sha256:99b37248a66bc90393f3ead3e8f8269dedc633a65e1d3928f97767b742e6ff46 AS build-base
+ARG BINREPO_BRANCH
+ARG BINREPO_PUBLISH
+ARG BINREPO_REPOSITORY
 ARG CLANG=
 ARG CROSSDEV_TARGETS=
 ARG TARGETPLATFORM
 RUN --mount=type=bind,from=ghcr.io/ksmanis/portage,source=/var/db/repos/gentoo,target=/var/db/repos/gentoo \
     --mount=type=cache,id=base,target=/var/cache/binpkgs \
+    --mount=type=secret,id=gh_token \
     set -eux; \
     getuto; \
     export EMERGE_DEFAULT_OPTS="--buildpkg --color=y --getbinpkg --jobs --quiet-build --tree --verbose"; \
@@ -35,18 +42,50 @@ RUN --mount=type=bind,from=ghcr.io/ksmanis/portage,source=/var/db/repos/gentoo,t
             crossdev --portage '--buildpkg --usepkg' --stable --target "${target}"; \
         done; \
     fi; \
+    if [ -n "${BINREPO_PUBLISH}" ]; then \
+        mkdir -p /var/db/repos/rookery; \
+        wget -nv 'https://github.com/KSmanis/rookery/archive/HEAD.tar.gz' -O /var/db/repos/rookery.tar.gz; \
+        tar -xzf /var/db/repos/rookery.tar.gz --strip-components=1 -C /var/db/repos/rookery; \
+        rm /var/db/repos/rookery.tar.gz; \
+        mkdir -p /etc/portage/repos.conf; \
+        printf '[rookery]\nauto-sync = no\nlocation = /var/db/repos/rookery\n' > /etc/portage/repos.conf/rookery.conf; \
+        ACCEPT_KEYWORDS='**' emerge --oneshot app-portage/portage-github-binrepo; \
+        printf 'branch = %s\nrepository = %s\ntoken-file = /run/secrets/gh_token\n' "${BINREPO_BRANCH}" "${BINREPO_REPOSITORY}" > /etc/portage/github-binrepo.conf; \
+        portage-github-binrepo check; \
+    fi; \
     emerge --oneshot gentoolkit; \
     eclean packages; \
+    if [ -n "${BINREPO_PUBLISH}" ]; then portage-github-binrepo push; fi; \
     CLEAN_DELAY=0 emerge --depclean gentoolkit; \
+    if [ -n "${BINREPO_PUBLISH}" ]; then \
+        CLEAN_DELAY=0 emerge --depclean app-portage/portage-github-binrepo; \
+        rm -rf /etc/portage/github-binrepo.conf /etc/portage/repos.conf/rookery.conf /var/db/repos/rookery; \
+    fi; \
     find /var/cache/distfiles/ -mindepth 1 -delete -print; \
     rm -rf /etc/portage/gnupg/
 
 FROM build-base AS build-ccache
+ARG BINREPO_BRANCH
+ARG BINREPO_PUBLISH
+ARG BINREPO_REPOSITORY
 RUN --mount=type=bind,from=ghcr.io/ksmanis/portage,source=/var/db/repos/gentoo,target=/var/db/repos/gentoo \
     --mount=type=cache,id=ccache,target=/var/cache/binpkgs \
+    --mount=type=secret,id=gh_token \
     set -eux; \
     getuto; \
     export EMERGE_DEFAULT_OPTS="--buildpkg --color=y --getbinpkg --jobs --quiet-build --tree --verbose"; \
+    if [ -n "${BINREPO_PUBLISH}" ]; then \
+        mkdir -p /var/db/repos/rookery; \
+        wget -nv 'https://github.com/KSmanis/rookery/archive/HEAD.tar.gz' -O /var/db/repos/rookery.tar.gz; \
+        tar -xzf /var/db/repos/rookery.tar.gz --strip-components=1 -C /var/db/repos/rookery; \
+        rm /var/db/repos/rookery.tar.gz; \
+        mkdir -p /etc/portage/repos.conf; \
+        printf '[rookery]\nauto-sync = no\nlocation = /var/db/repos/rookery\n' > /etc/portage/repos.conf/rookery.conf; \
+        ACCEPT_KEYWORDS='**' emerge --oneshot app-portage/portage-github-binrepo; \
+        printf 'branch = %s\nrepository = %s\ntoken-file = /run/secrets/gh_token\n' "${BINREPO_BRANCH}" "${BINREPO_REPOSITORY}" > /etc/portage/github-binrepo.conf; \
+        portage-github-binrepo check; \
+        portage-github-binrepo pull; \
+    fi; \
     emerge --info; \
     mkdir -p /etc/portage/package.use; \
     echo 'dev-util/ccache http redis' > /etc/portage/package.use/ccache; \
@@ -54,7 +93,12 @@ RUN --mount=type=bind,from=ghcr.io/ksmanis/portage,source=/var/db/repos/gentoo,t
     ccache --version; \
     emerge --oneshot gentoolkit; \
     eclean packages; \
+    if [ -n "${BINREPO_PUBLISH}" ]; then portage-github-binrepo push; fi; \
     CLEAN_DELAY=0 emerge --depclean gentoolkit; \
+    if [ -n "${BINREPO_PUBLISH}" ]; then \
+        CLEAN_DELAY=0 emerge --depclean app-portage/portage-github-binrepo; \
+        rm -rf /etc/portage/github-binrepo.conf /etc/portage/repos.conf/rookery.conf /var/db/repos/rookery; \
+    fi; \
     find /var/cache/distfiles/ -mindepth 1 -delete -print; \
     rm -rf /etc/portage/gnupg/
 ARG CCACHE_DIR=/var/cache/ccache
