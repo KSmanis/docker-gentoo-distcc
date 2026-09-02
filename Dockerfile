@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1.26.0@sha256:ecfaec9ed6d810b56388c508f4121597bfbba70d41a6dfeee4d8cad5f295fc32
+# syntax=docker/dockerfile:1.27.0@sha256:bde3983e9c939224420ddaf6b784cc30e09b035a4dea01f581230c50809f372e
 ARG BASE=build-base
 
 FROM ghcr.io/ksmanis/stage3:20260831@sha256:7702179ceeb79f8a2a2678cb399194b2b16ad19009991112554b58e9ed92b80a AS build-base
