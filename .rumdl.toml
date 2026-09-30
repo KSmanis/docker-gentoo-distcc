@@ -1,0 +1,7 @@
+[MD013]
+code-blocks = false
+reflow = true
+reflow-mode = "normalize"
+
+[global]
+flavor = "github"

@@ -9,9 +9,8 @@ repos:
         priority: &read-only 1000
       - id: check-useless-excludes
         priority: *read-only
-  # Generic
-  - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v6.0.0
+  # Builtin
+  - repo: builtin
     hooks:
       - id: check-executables-have-shebangs
         priority: *read-only
@@ -39,6 +38,11 @@ repos:
       - id: check-compose-spec
         priority: *read-only
   # Git
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.30.1
+    hooks:
+      - id: gitleaks
+        priority: *read-only
   - repo: https://github.com/jorisroovers/gitlint
     rev: v0.19.1
     hooks:
@@ -46,14 +50,23 @@ repos:
         priority: *read-only
       - id: gitlint-ci
   # GitHub Actions
+  - repo: https://github.com/python-jsonschema/check-jsonschema
+    rev: 0.38.2
+    hooks:
+      - id: check-github-workflows
+        priority: *read-only
   - repo: https://github.com/rhysd/actionlint
     rev: v1.7.12
     hooks:
       - id: actionlint
         priority: *read-only
+  - repo: https://github.com/zizmorcore/zizmor-pre-commit
+    rev: v1.30.1
+    hooks:
+      - id: zizmor
+        priority: *read-only
   # JSON
-  - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v6.0.0
+  - repo: builtin
     hooks:
       - id: pretty-format-json
         args: ["--autofix", "--no-ensure-ascii"]
@@ -61,18 +74,22 @@ repos:
       - id: check-json
         priority: *read-only
   # Markdown
-  - repo: https://github.com/executablebooks/mdformat
-    rev: 1.0.0
+  - repo: https://github.com/rvben/rumdl-pre-commit
+    rev: v0.2.77
     hooks:
-      - id: mdformat
-        additional_dependencies:
-          - mdformat-gfm
-        args: ["--number", "--wrap=80"]
+      - id: rumdl
+        args: ["--fix"]
         priority: *write-parallel
-  - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.49.1
+  # TOML
+  - repo: https://github.com/pappasam/toml-sort
+    rev: v0.25.0
     hooks:
-      - id: markdownlint
+      - id: toml-sort-fix
+        args: ["--all", "--in-place", "--trailing-comma-inline-array"]
+        priority: *write-parallel
+  - repo: builtin
+    hooks:
+      - id: check-toml
         priority: *read-only
   # Shell
   - repo: https://github.com/shellcheck-py/shellcheck-py

@@ -1,5 +1,10 @@
 name: build
 on: [pull_request, push, workflow_dispatch]
+concurrency:
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+permissions:
+  contents: read
 env:
   DOCKER_CACHE_REPOSITORY: ghcr.io/ksmanis/gentoo-distcc-cache
   DOCKERHUB_REPOSITORY: ksmanis/gentoo-distcc
@@ -64,6 +69,8 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
       - name: Prepare build variables
         id: prep
         run: |
@@ -114,9 +121,11 @@ jobs:
             cache-mount-${{ matrix.arch.id }}-${{ matrix.manifest.id }}-
             cache-mount-${{ matrix.arch.id }}-
       - name: Inject Docker mounts cache
+        env:
+          BUILDX_BUILDER: ${{ steps.setup-buildx.outputs.name }}
         run: |
           node buildkit-cache-dance/dist/index.js \
-            --builder "${{ steps.setup-buildx.outputs.name }}" \
+            --builder "${BUILDX_BUILDER}" \
             --cache-dir cache-mount \
             --cache-map '{"cache-mount/base":{"id":"base","target":"/var/cache/binpkgs"},"cache-mount/ccache":{"id":"ccache","target":"/var/cache/binpkgs"}}'
       - name: Log in to Docker Hub
@@ -150,8 +159,10 @@ jobs:
           tags: ${{ steps.docker-metadata.outputs.tags }}
           target: distcc
       - name: Inspect image
+        env:
+          IMAGE_ID: ${{ steps.build.outputs.imageid }}
         run: |
-          docker image inspect ${{ steps.build.outputs.imageid }}
+          docker image inspect "${IMAGE_ID}"
       - name: Test distcc
         env:
           DOCKER_DEFAULT_PLATFORM: linux/${{ matrix.arch.id }}
@@ -182,10 +193,12 @@ jobs:
           target: distcc
       - name: Extract Docker mounts cache
         if: github.ref_name == github.event.repository.default_branch
+        env:
+          BUILDX_BUILDER: ${{ steps.setup-buildx.outputs.name }}
         run: |
           node buildkit-cache-dance/dist/index.js \
             --extract \
-            --builder "${{ steps.setup-buildx.outputs.name }}" \
+            --builder "${BUILDX_BUILDER}" \
             --cache-dir cache-mount \
             --cache-map '{"cache-mount/base":{"id":"base","target":"/var/cache/binpkgs"},"cache-mount/ccache":{"id":"ccache","target":"/var/cache/binpkgs"}}'
       - name: Save Docker mounts cache
@@ -239,6 +252,8 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
       - name: Download image results
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         with:
