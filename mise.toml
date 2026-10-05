@@ -1,4 +1,4 @@
 min_version = "2026.9.16"
 
 [tools]
-prek = "0.5.4"
+prek = "0.5.5"
