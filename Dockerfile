@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1.28.0@sha256:bb22d9815c728170f72750f4e5b0d672e06176142e1d602c7e66c050100b7e5b
 ARG BASE=build-base
 
-FROM ghcr.io/ksmanis/stage3:20261012@sha256:f0bdd109053e6674c522c61bd639d6eeb0aac1a195aa661a7306da6759047e3a AS build-base
+FROM ghcr.io/ksmanis/stage3:20261019@sha256:43e26fe3b1da6b95c25298cd45bcf15e695b86fd6856c816dbafa7d3796aac4a AS build-base
 ARG CLANG=
 ARG CROSSDEV_TARGETS=
 ARG TARGETPLATFORM
