@@ -33,7 +33,7 @@ repos:
       - id: hadolint-docker
         priority: *read-only
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.38.2
+    rev: 0.39.0
     hooks:
       - id: check-compose-spec
         priority: *read-only
@@ -51,7 +51,7 @@ repos:
       - id: gitlint-ci
   # GitHub Actions
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.38.2
+    rev: 0.39.0
     hooks:
       - id: check-github-workflows
         priority: *read-only
